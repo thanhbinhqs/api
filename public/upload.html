@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Upload with Resume</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .upload-container {
+        border: 2px dashed #ccc;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .progress-container {
+        margin-top: 20px;
+        display: none;
+      }
+      .progress-bar {
+        height: 20px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        overflow: hidden;
+      }
+      .progress {
+        height: 100%;
+        background-color: #4caf50;
+        width: 0%;
+        transition: width 0.3s;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>File Upload with Resume Support</h1>
+    <div class="upload-container">
+      <input type="file" id="fileInput" />
+      <button id="uploadBtn">Upload File</button>
+      <button id="pauseBtn" disabled>Pause</button>
+      <button id="resumeBtn" disabled>Resume</button>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+      </div>
+      <div id="status"></div>
+      <div id="loaded"></div>
+      <div id="fileId"></div>
+    </div>
+
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resumeBtn = document.getElementById('resumeBtn');
+      const progressBar = document.getElementById('progressBar');
+      const statusText = document.getElementById('status');
+      const loadedText = document.getElementById('loaded');
+      const fileIdText = document.getElementById('fileId');
+      const progressContainer = document.querySelector('.progress-container');
+
+      let file = null;
+      let fileSize = 0;
+      let chunkSize = 1024 * 1024; // 1MB chunks
+      let uploadedBytes = 0;
+      let xhr = null;
+      let fileId = null;
+      let chunkIndex = 0;
+
+      fileInput.addEventListener('change', (e) => {
+        file = e.target.files[0];
+        fileSize = file.size;
+        uploadedBytes = 0;
+        fileId = null;
+        progressContainer.style.display = 'none';
+        pauseBtn.disabled = true;
+        resumeBtn.disabled = true;
+      });
+
+      uploadBtn.addEventListener('click', () => {
+        if (!file) {
+          alert('Please select a file first');
+          return;
+        }
+        startUpload();
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        if (xhr) {
+          xhr.abort();
+          xhr = null;
+          statusText.textContent = 'Upload paused';
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = false;
+        }
+      });
+
+      resumeBtn.addEventListener('click', () => {
+        if (file && fileId) {
+          resumeBtn.disabled = true;
+          pauseBtn.disabled = false;
+          statusText.textContent = 'Resuming upload...';
+          startUpload(true);
+        }
+      });
+
+      function startUpload(resume = false) {
+        progressContainer.style.display = 'block';
+        statusText.textContent = 'Uploading...';
+        pauseBtn.disabled = false;
+        resumeBtn.disabled = true;
+        uploadBtn.disabled = true;
+        fileIdText.textContent = 'FileID: ' + fileId;
+
+        // First check if we need to resume
+        if (fileId && resume) {
+          const checkFormData = new FormData();
+          if (resume) checkFormData.append('resumeCheck', '1');
+          checkFormData.append('fileId', fileId);
+          checkFormData.append('fileSize', file.size);
+          const totalChunks = Math.ceil(fileSize / chunkSize);
+          checkFormData.append('totalChunks', totalChunks);
+
+          const checkXhr = new XMLHttpRequest();
+          checkXhr.open('POST', '/api/v1/files/upload', true);
+          checkXhr.onload = () => {
+            if (checkXhr.status === 200 || checkXhr.status == 201) {
+              const response = JSON.parse(checkXhr.responseText);
+              fileId = response.data.fileId;
+              chunkIndex = response.data.chunkIndex;
+              uploadedBytes = response.data.chunkIndex * chunkSize;
+              startUpload(false);
+            } else {
+              statusText.textContent = 'Upload failed';
+              uploadBtn.disabled = false;
+            }
+          };
+          checkXhr.send(checkFormData);
+          return;
+        }
+
+        const formData = new FormData();
+        const chunk = file.slice(uploadedBytes, uploadedBytes + chunkSize);
+        const totalChunks = Math.ceil(fileSize / chunkSize);
+        let currentChunk = Math.floor(uploadedBytes / chunkSize);
+
+        formData.append('file', chunk);
+        formData.append('chunkIndex', currentChunk.toString());
+        formData.append('totalChunks', totalChunks.toString());
+        formData.append('fileName', file.name);
+
+        if (fileId) {
+          formData.append('fileId', fileId);
+        }
+
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/v1/files/upload', true);
+
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentComplete =
+              ((uploadedBytes + e.loaded) / fileSize) * 100;
+            progressBar.style.width = percentComplete + '%';
+            loadedText.textContent = `Uploaded: ${formatBytes(uploadedBytes + e.loaded)} / ${formatBytes(fileSize)}`;
+          }
+        };
+
+        xhr.onload = () => {
+          if (xhr.status == 200 || xhr.status == 201) {
+            const response = JSON.parse(xhr.responseText);
+
+            fileId = response.data.fileId;
+
+            if (response.data.id) {
+              // Final response when upload completes
+              fileId = null;
+              currentChunk = 0;
+              fileIdText.textContent = '';
+              statusText.textContent =
+                'Upload complete! File ID: ' + response.data.id;
+              progressBar.style.width = '100%';
+              loadedText.textContent = `Uploaded: ${formatBytes(fileSize)} / ${formatBytes(fileSize)}`;
+              pauseBtn.disabled = true;
+              uploadBtn.disabled = false;
+              xhr = null;
+            } else if (response.data.chunkIndex != undefined) {
+              uploadedBytes =
+                (Number(response.data.chunkIndex) + 1) * chunkSize;
+              if (uploadedBytes > fileSize) uploadedBytes = fileSize;
+              if (uploadedBytes <= fileSize) {
+                startUpload(false);
+              } else {
+                statusText.textContent = 'Upload complete!';
+                progressBar.style.width = '100%';
+                loadedText.textContent = `Uploaded: ${formatBytes(fileSize)} / ${formatBytes(fileSize)}`;
+                pauseBtn.disabled = true;
+                uploadBtn.disabled = false;
+                xhr = null;
+              }
+            }
+          } else {
+            statusText.textContent = 'Upload error: ' + xhr.statusText;
+            pauseBtn.disabled = true;
+            resumeBtn.disabled = false;
+            uploadBtn.disabled = false;
+          }
+        };
+
+        xhr.onerror = () => {
+          statusText.textContent = 'Upload error occurred';
+          pauseBtn.disabled = true;
+          resumeBtn.disabled = false;
+          uploadBtn.disabled = false;
+        };
+
+        xhr.send(formData);
+      }
+
+      function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return (
+          parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+        );
+      }
+    </script>
+  </body>
+</html>
