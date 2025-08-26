@@ -6,7 +6,7 @@ export class CreateShareDto {
     required: false,
     description: 'Password to protect the shared file',
     example: 'secret123',
-    type: String
+    type: String,
   })
   @IsOptional()
   @IsString()
@@ -16,7 +16,7 @@ export class CreateShareDto {
     required: false,
     description: 'Expiration date of the share link (ISO format)',
     example: '2025-12-31T23:59:59Z',
-    type: Date
+    type: Date,
   })
   @IsOptional()
   @IsDateString()
@@ -26,7 +26,7 @@ export class CreateShareDto {
     required: false,
     description: 'Maximum number of downloads allowed',
     example: 10,
-    type: Number
+    type: Number,
   })
   @IsOptional()
   @IsNumber()

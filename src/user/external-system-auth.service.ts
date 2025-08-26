@@ -34,7 +34,7 @@ export class ExternalSystemAuthService {
     }
 
     const currentAuthInfo = user.externalSystemAuthInfo || {};
-    
+
     const updatedCredentials: ExternalSystemCredentials = {
       systemName,
       username: credentials.username,
@@ -53,7 +53,9 @@ export class ExternalSystemAuthService {
     user.externalSystemAuthInfo = currentAuthInfo;
 
     await this.userRepository.save(user);
-    this.logger.log(`Updated external system auth for user ${userId}, system ${systemName}`);
+    this.logger.log(
+      `Updated external system auth for user ${userId}, system ${systemName}`,
+    );
   }
 
   /**
@@ -82,7 +84,9 @@ export class ExternalSystemAuthService {
   /**
    * Lấy tất cả thông tin đăng nhập hệ thống bên ngoài
    */
-  async getAllExternalSystemAuth(userId: string): Promise<ExternalSystemAuthInfo | null> {
+  async getAllExternalSystemAuth(
+    userId: string,
+  ): Promise<ExternalSystemAuthInfo | null> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       return null;
@@ -94,7 +98,10 @@ export class ExternalSystemAuthService {
   /**
    * Xóa thông tin đăng nhập hệ thống bên ngoài
    */
-  async removeExternalSystemAuth(userId: string, systemName: string): Promise<void> {
+  async removeExternalSystemAuth(
+    userId: string,
+    systemName: string,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user || !user.externalSystemAuthInfo) {
       return;
@@ -102,7 +109,9 @@ export class ExternalSystemAuthService {
 
     delete user.externalSystemAuthInfo[systemName];
     await this.userRepository.save(user);
-    this.logger.log(`Removed external system auth for user ${userId}, system ${systemName}`);
+    this.logger.log(
+      `Removed external system auth for user ${userId}, system ${systemName}`,
+    );
   }
 
   /**
@@ -121,11 +130,12 @@ export class ExternalSystemAuthService {
     if (credentials.expiresAt && credentials.expiresAt <= now) {
       status = ExternalSystemAuthStatus.EXPIRED;
       message = `Thông tin đăng nhập hệ thống ${systemName} đã hết hạn`;
-    } 
+    }
     // Kiểm tra sắp hết hạn (7 ngày)
     else if (credentials.expiresAt) {
       const daysUntilExpiry = Math.ceil(
-        (credentials.expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        (credentials.expiresAt.getTime() - now.getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       if (daysUntilExpiry <= 7) {
         status = ExternalSystemAuthStatus.NEEDS_REFRESH;
@@ -164,28 +174,35 @@ export class ExternalSystemAuthService {
 
     // Kiểm tra xem đã có thông báo tương tự chưa
     const existingNotification = user.externalSystemAuthNotifications.find(
-      (n) => n.systemName === notification.systemName && n.status === notification.status,
+      (n) =>
+        n.systemName === notification.systemName &&
+        n.status === notification.status,
     );
 
     if (!existingNotification) {
       user.externalSystemAuthNotifications.push(notification);
-      
+
       // Giữ tối đa 10 thông báo gần nhất
       if (user.externalSystemAuthNotifications.length > 10) {
-        user.externalSystemAuthNotifications = user.externalSystemAuthNotifications
-          .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-          .slice(0, 10);
+        user.externalSystemAuthNotifications =
+          user.externalSystemAuthNotifications
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .slice(0, 10);
       }
 
       await this.userRepository.save(user);
-      this.logger.warn(`Created auth notification for user ${user.id}: ${notification.message}`);
+      this.logger.warn(
+        `Created auth notification for user ${user.id}: ${notification.message}`,
+      );
     }
   }
 
   /**
    * Lấy thông báo đăng nhập hệ thống bên ngoài
    */
-  async getAuthNotifications(userId: string): Promise<ExternalSystemAuthNotification[]> {
+  async getAuthNotifications(
+    userId: string,
+  ): Promise<ExternalSystemAuthNotification[]> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       return [];
@@ -197,15 +214,19 @@ export class ExternalSystemAuthService {
   /**
    * Xóa thông báo đăng nhập
    */
-  async clearAuthNotifications(userId: string, systemName?: string): Promise<void> {
+  async clearAuthNotifications(
+    userId: string,
+    systemName?: string,
+  ): Promise<void> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       return;
     }
 
     if (systemName) {
-      user.externalSystemAuthNotifications = (user.externalSystemAuthNotifications || [])
-        .filter(n => n.systemName !== systemName);
+      user.externalSystemAuthNotifications = (
+        user.externalSystemAuthNotifications || []
+      ).filter((n) => n.systemName !== systemName);
     } else {
       user.externalSystemAuthNotifications = [];
     }
@@ -230,6 +251,8 @@ export class ExternalSystemAuthService {
     user.externalSystemAuthInfo[systemName].lastUpdated = new Date();
 
     await this.userRepository.save(user);
-    this.logger.log(`Updated system status for user ${userId}, system ${systemName}: ${isActive}`);
+    this.logger.log(
+      `Updated system status for user ${userId}, system ${systemName}: ${isActive}`,
+    );
   }
 }

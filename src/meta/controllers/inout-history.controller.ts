@@ -42,19 +42,25 @@ export class InOutHistoryController {
     description: 'Lịch sử nhập/xuất đã được tạo thành công',
     type: InOutHistory,
   })
-  async create(@Body() createInOutHistoryDto: CreateInOutHistoryDto): Promise<InOutHistory> {
+  async create(
+    @Body() createInOutHistoryDto: CreateInOutHistoryDto,
+  ): Promise<InOutHistory> {
     return this.inOutHistoryService.createInOutHistory(createInOutHistoryDto);
   }
 
   @Get()
   @HasPermission(Permission.INOUT_HISTORY_READ)
-  @ApiOperation({ summary: 'Lấy danh sách lịch sử nhập/xuất với filter và phân trang' })
+  @ApiOperation({
+    summary: 'Lấy danh sách lịch sử nhập/xuất với filter và phân trang',
+  })
   @ApiResponse({
     status: 200,
     description: 'Danh sách lịch sử nhập/xuất',
     type: PaginatedResult<InOutHistory>,
   })
-  async findAll(@Query() filterDto: InOutHistoryFilterDto): Promise<PaginatedResult<InOutHistory>> {
+  async findAll(
+    @Query() filterDto: InOutHistoryFilterDto,
+  ): Promise<PaginatedResult<InOutHistory>> {
     return this.inOutHistoryService.findAllInOutHistories(filterDto);
   }
 
@@ -89,7 +95,9 @@ export class InOutHistoryController {
     description: 'Lịch sử nhập/xuất theo part',
     type: [InOutHistory],
   })
-  async getHistoryByPart(@Param('partId', ParseUUIDPipe) partId: string): Promise<InOutHistory[]> {
+  async getHistoryByPart(
+    @Param('partId', ParseUUIDPipe) partId: string,
+  ): Promise<InOutHistory[]> {
     return this.inOutHistoryService.getHistoryByPart(partId);
   }
 
@@ -101,7 +109,9 @@ export class InOutHistoryController {
     description: 'Lịch sử nhập/xuất theo part detail',
     type: [InOutHistory],
   })
-  async getHistoryByPartDetail(@Param('partDetailId', ParseUUIDPipe) partDetailId: string): Promise<InOutHistory[]> {
+  async getHistoryByPartDetail(
+    @Param('partDetailId', ParseUUIDPipe) partDetailId: string,
+  ): Promise<InOutHistory[]> {
     return this.inOutHistoryService.getHistoryByPartDetail(partDetailId);
   }
 
@@ -114,9 +124,12 @@ export class InOutHistoryController {
     type: InOutHistory,
   })
   async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<InOutHistory> {
-    const inOutHistory = await this.inOutHistoryService.findInOutHistoryById(id);
+    const inOutHistory =
+      await this.inOutHistoryService.findInOutHistoryById(id);
     if (!inOutHistory) {
-      throw new NotFoundException(`Lịch sử nhập/xuất với ID "${id}" không tồn tại`);
+      throw new NotFoundException(
+        `Lịch sử nhập/xuất với ID "${id}" không tồn tại`,
+      );
     }
     return inOutHistory;
   }
@@ -133,7 +146,10 @@ export class InOutHistoryController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateInOutHistoryDto: UpdateInOutHistoryDto,
   ): Promise<InOutHistory> {
-    return this.inOutHistoryService.updateInOutHistory(id, updateInOutHistoryDto);
+    return this.inOutHistoryService.updateInOutHistory(
+      id,
+      updateInOutHistoryDto,
+    );
   }
 
   @Delete(':id')
@@ -143,7 +159,9 @@ export class InOutHistoryController {
     status: 200,
     description: 'Lịch sử nhập/xuất đã được xóa thành công',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.inOutHistoryService.deleteInOutHistory(id);
     return { message: 'Lịch sử nhập/xuất đã được xóa thành công' };
   }

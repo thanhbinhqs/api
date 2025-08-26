@@ -38,11 +38,12 @@ export class PermissionGuard implements CanActivate {
       request.systemSettings?.[SystemSettingKey.SYSTEM_AUDIT_LOG_ENABLED] ||
       false;
     if (auditLogEnabled) {
-      console.log(`Permission check for user ${user?.username}`, {
-        permissions: permissionOptions,
-        roles: role,
-        timestamp: new Date().toISOString(),
-      });
+      // TODO: Replace with proper logging service
+      // console.log(`Permission check for user ${user?.username}`, {
+      //   permissions: permissionOptions,
+      //   roles: role,
+      //   timestamp: new Date().toISOString(),
+      // });
     }
 
     if (role) {

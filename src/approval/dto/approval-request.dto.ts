@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsEnum, IsObject, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  IsDateString,
+} from 'class-validator';
 import { ApprovalPriority } from '../enums';
 
 export class CreateApprovalRequestDto {

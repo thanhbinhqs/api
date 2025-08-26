@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsDateString, IsObject, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsDateString,
+  IsObject,
+  IsBoolean,
+} from 'class-validator';
 
 export class CreateApprovalDelegationDto {
   @IsString()

@@ -26,7 +26,7 @@ export class FileShareRepository extends Repository<FileShare> {
 
   async incrementDownloadCount(share: FileShare): Promise<void> {
     await this.update(share.id, {
-      downloadCount: share.downloadCount + 1
+      downloadCount: share.downloadCount + 1,
     });
   }
 }

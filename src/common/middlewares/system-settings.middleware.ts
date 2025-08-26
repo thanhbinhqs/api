@@ -14,7 +14,7 @@ export class SystemSettingsMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       const { data } = await this.systemSettingsService.getAllSettings(1, 1000);
-      const secret = this.configService.get("JWT_SECRET");
+      const secret = this.configService.get('JWT_SECRET');
       req.systemSettings = data;
       req.secret = secret;
     } catch (error) {

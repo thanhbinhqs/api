@@ -24,38 +24,33 @@ import { InOutHistory } from 'src/meta/entities/inout-history.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Jig, 
-      JigDetail, 
-      JigDrawing, 
-      JigOrder, 
+      Jig,
+      JigDetail,
+      JigDrawing,
+      JigOrder,
       JigOrderDetail,
       User,
       Location,
       Line,
-      InOutHistory
+      InOutHistory,
     ]),
     UserModule,
     ApprovalModule,
-    NotificationModule
+    NotificationModule,
   ],
   controllers: [
-    JigController, 
-    JigDetailController, 
+    JigController,
+    JigDetailController,
     JigDrawingController,
-    JigOrderController
+    JigOrderController,
   ],
   providers: [
-    JigService, 
-    JigDetailService, 
+    JigService,
+    JigDetailService,
     JigDrawingService,
     JigOrderService,
-    JigOrderNotificationListener
+    JigOrderNotificationListener,
   ],
-  exports: [
-    JigService, 
-    JigDetailService, 
-    JigDrawingService,
-    JigOrderService
-  ],
+  exports: [JigService, JigDetailService, JigDrawingService, JigOrderService],
 })
 export class JigModule {}

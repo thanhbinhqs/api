@@ -1,99 +1,200 @@
-import { IsOptional, IsEnum, IsString, IsUUID, IsDateString, IsNumber } from 'class-validator';
-import { Transform } from 'class-transformer';
-import { TaskType, TaskPriority, TaskStatus, AssigneeType } from '../entities/task.entity';
+import {
+  IsOptional,
+  IsEnum,
+  IsString,
+  IsUUID,
+  IsDateString,
+  IsNumber,
+  IsBoolean,
+} from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  TaskType,
+  TaskPriority,
+  TaskStatus,
+  AssigneeType,
+} from '../entities/task.entity';
 
 export class TaskFilterDto {
-    @IsOptional()
-    @IsString()
-    search?: string;
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  search?: string;
 
-    @IsOptional()
-    @IsString()
-    searchContent?: string; // Tìm kiếm trong nội dung chi tiết
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  searchContent?: string; // Tìm kiếm trong nội dung chi tiết
 
-    @IsOptional()
-    @IsEnum(TaskType)
-    type?: TaskType;
+  @IsOptional()
+  @IsEnum(TaskType)
+  type?: TaskType;
 
-    @IsOptional()
-    @IsEnum(TaskPriority)
-    priority?: TaskPriority;
+  @IsOptional()
+  @IsEnum(TaskPriority)
+  priority?: TaskPriority;
 
-    @IsOptional()
-    @IsEnum(TaskStatus)
-    status?: TaskStatus;
+  @IsOptional()
+  @IsEnum(TaskStatus)
+  status?: TaskStatus;
 
-    @IsOptional()
-    @IsEnum(AssigneeType)
-    assigneeType?: AssigneeType;
+  @IsOptional()
+  @IsEnum(AssigneeType)
+  assigneeType?: AssigneeType;
 
-    @IsOptional()
-    @IsUUID()
-    assignedUserId?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  assignedUserId?: string;
 
-    @IsOptional()
-    @IsUUID()
-    assignedRoleId?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  assignedRoleId?: string;
 
-    @IsOptional()
-    @IsUUID()
-    executedBy?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  executedBy?: string;
 
-    @IsOptional()
-    @IsUUID()
-    createdBy?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  createdBy?: string;
 
-    @IsOptional()
-    @IsUUID()
-    relatedJigId?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  relatedJigId?: string;
 
-    @IsOptional()
-    @IsUUID()
-    relatedJigDetailId?: string;
+  @IsOptional()
+  @IsUUID()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  relatedJigDetailId?: string;
 
-    @IsOptional()
-    @IsDateString()
-    scheduledStartFrom?: string;
+  // === DATE FILTERS với validation tốt hơn ===
+  @IsOptional()
+  @IsDateString()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : value;
+  })
+  scheduledStartFrom?: string;
 
-    @IsOptional()
-    @IsDateString()
-    scheduledStartTo?: string;
+  @IsOptional()
+  @IsDateString()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : value;
+  })
+  scheduledStartTo?: string;
 
-    @IsOptional()
-    @IsDateString()
-    scheduledEndFrom?: string;
+  @IsOptional()
+  @IsDateString()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : value;
+  })
+  scheduledEndFrom?: string;
 
-    @IsOptional()
-    @IsDateString()
-    scheduledEndTo?: string;
+  @IsOptional()
+  @IsDateString()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : value;
+  })
+  scheduledEndTo?: string;
 
-    @IsOptional()
-    @Transform(({ value }) => value === 'true')
-    isRecurring?: boolean;
+  // === BOOLEAN FILTERS với transform tốt hơn ===
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      const lowerValue = value.toLowerCase().trim();
+      if (lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes')
+        return true;
+      if (lowerValue === 'false' || lowerValue === '0' || lowerValue === 'no')
+        return false;
+    }
+    return undefined;
+  })
+  @IsBoolean()
+  isRecurring?: boolean;
 
-    @IsOptional()
-    @Transform(({ value }) => value === 'true')
-    isOverdue?: boolean;
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      const lowerValue = value.toLowerCase().trim();
+      if (lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes')
+        return true;
+      if (lowerValue === 'false' || lowerValue === '0' || lowerValue === 'no')
+        return false;
+    }
+    return undefined;
+  })
+  @IsBoolean()
+  isOverdue?: boolean;
 
-    @IsOptional()
-    @IsString()
-    tags?: string;
+  // === STRING ARRAY FILTER ===
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  tags?: string;
 
-    @IsOptional()
-    @Transform(({ value }) => parseInt(value))
-    @IsNumber()
-    page?: number = 1;
+  // === PAGINATION với validation ===
+  @IsOptional()
+  @Transform(({ value }) => {
+    const num = parseInt(value);
+    return isNaN(num) || num < 1 ? 1 : num;
+  })
+  @IsNumber()
+  @Type(() => Number)
+  page?: number = 1;
 
-    @IsOptional()
-    @Transform(({ value }) => parseInt(value))
-    @IsNumber()
-    limit?: number = 10;
+  @IsOptional()
+  @Transform(({ value }) => {
+    const num = parseInt(value);
+    return isNaN(num) || num < 1 ? 10 : Math.min(100, num); // Giới hạn max 100
+  })
+  @IsNumber()
+  @Type(() => Number)
+  limit?: number = 10;
 
-    @IsOptional()
-    @IsString()
-    sortBy?: string = 'createdAt';
+  // === SORTING với validation ===
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => {
+    const allowedFields = [
+      'id',
+      'title',
+      'type',
+      'priority',
+      'status',
+      'assigneeType',
+      'createdAt',
+      'updatedAt',
+      'scheduledStartDate',
+      'scheduledEndDate',
+      'actualStartDate',
+      'actualEndDate',
+      'estimatedDuration',
+      'actualDuration',
+    ];
+    return allowedFields.includes(value) ? value : 'createdAt';
+  })
+  sortBy?: string = 'createdAt';
 
-    @IsOptional()
-    @IsString()
-    sortOrder?: 'ASC' | 'DESC' = 'DESC';
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => {
+    return value === 'ASC' || value === 'DESC' ? value : 'DESC';
+  })
+  sortOrder?: 'ASC' | 'DESC' = 'DESC';
 }

@@ -27,43 +27,43 @@ import { UserModule } from '../user/user.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Zone, 
-      Line, 
-      Project, 
-      Process, 
-      InOutHistory, 
-      Location, 
-      Vendor
+      Zone,
+      Line,
+      Project,
+      Process,
+      InOutHistory,
+      Location,
+      Vendor,
     ]),
-    UserModule
+    UserModule,
   ],
   controllers: [
-    ZoneController, 
-    LineController, 
-    ProjectController, 
-    ProcessController, 
+    ZoneController,
+    LineController,
+    ProjectController,
+    ProcessController,
     InOutHistoryController,
     LocationController,
     VendorController,
-    MetadataController
+    MetadataController,
   ],
   providers: [
-    ZoneService, 
-    LineService, 
-    ProjectService, 
-    ProcessService, 
+    ZoneService,
+    LineService,
+    ProjectService,
+    ProcessService,
     InOutHistoryService,
     LocationService,
-    VendorService
+    VendorService,
   ],
   exports: [
-    ZoneService, 
-    LineService, 
-    ProjectService, 
-    ProcessService, 
+    ZoneService,
+    LineService,
+    ProjectService,
+    ProcessService,
     InOutHistoryService,
     LocationService,
-    VendorService
+    VendorService,
   ],
 })
 export class MetaModule {}

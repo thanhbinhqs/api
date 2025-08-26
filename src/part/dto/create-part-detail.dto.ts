@@ -1,11 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 import { PartDetailStatus } from '../entities/part-detail.entity';
 
 export class CreatePartDetailDto {
   @ApiProperty({
     description: 'ID của part',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsNotEmpty()
@@ -13,7 +19,7 @@ export class CreatePartDetailDto {
 
   @ApiProperty({
     description: 'Số serial (duy nhất)',
-    example: 'SN-MOT-001-2024'
+    example: 'SN-MOT-001-2024',
   })
   @IsString()
   @IsNotEmpty()
@@ -21,7 +27,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'ID của vị trí',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()
@@ -31,7 +37,7 @@ export class CreatePartDetailDto {
     description: 'Trạng thái',
     example: PartDetailStatus.AVAILABLE,
     enum: PartDetailStatus,
-    default: PartDetailStatus.AVAILABLE
+    default: PartDetailStatus.AVAILABLE,
   })
   @IsOptional()
   @IsEnum(PartDetailStatus)
@@ -39,7 +45,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'Ngày mua',
-    example: '2024-01-15T00:00:00.000Z'
+    example: '2024-01-15T00:00:00.000Z',
   })
   @IsOptional()
   @IsDateString()
@@ -47,7 +53,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'Ngày hết hạn bảo hành',
-    example: '2025-01-15T00:00:00.000Z'
+    example: '2025-01-15T00:00:00.000Z',
   })
   @IsOptional()
   @IsDateString()
@@ -55,7 +61,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'Ngày bảo trì lần cuối',
-    example: '2024-06-15T00:00:00.000Z'
+    example: '2024-06-15T00:00:00.000Z',
   })
   @IsOptional()
   @IsDateString()
@@ -63,7 +69,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'Ngày bảo trì tiếp theo',
-    example: '2024-12-15T00:00:00.000Z'
+    example: '2024-12-15T00:00:00.000Z',
   })
   @IsOptional()
   @IsDateString()
@@ -71,7 +77,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'Ghi chú',
-    example: 'Cần kiểm tra định kỳ hàng tháng'
+    example: 'Cần kiểm tra định kỳ hàng tháng',
   })
   @IsString()
   @IsOptional()
@@ -79,7 +85,7 @@ export class CreatePartDetailDto {
 
   @ApiPropertyOptional({
     description: 'ID của jig detail (nếu part detail thuộc về jig detail)',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()

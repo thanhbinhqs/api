@@ -7,7 +7,7 @@ export async function seedTaskPermissions(dataSource: DataSource) {
 
   // Lấy admin role
   const adminRole = await roleRepository.findOne({
-    where: { name: 'admin' }
+    where: { name: 'admin' },
   });
 
   if (adminRole) {
@@ -18,27 +18,27 @@ export async function seedTaskPermissions(dataSource: DataSource) {
       Permission.TASK_UPDATE,
       Permission.TASK_DELETE,
       Permission.TASK_ASSIGN,
-      Permission.TASK_MANAGE_ALL
+      Permission.TASK_MANAGE_ALL,
     ];
 
     const updatedPermissions = [...adminRole.permissions, ...taskPermissions];
     // Remove duplicates
     adminRole.permissions = [...new Set(updatedPermissions)];
-    
+
     await roleRepository.save(adminRole);
     console.log('✅ Đã thêm task permissions cho admin role');
   }
 
   // Lấy hoặc tạo technician role
   let technicianRole = await roleRepository.findOne({
-    where: { name: 'technician' }
+    where: { name: 'technician' },
   });
 
   if (!technicianRole) {
     technicianRole = roleRepository.create({
       name: 'technician',
       description: 'Kỹ thuật viên - Có thể thực hiện tasks được giao',
-      permissions: []
+      permissions: [],
     });
   }
 
@@ -48,22 +48,25 @@ export async function seedTaskPermissions(dataSource: DataSource) {
     Permission.TASK_UPDATE, // Để có thể cập nhật progress và complete task
   ];
 
-  const updatedTechPermissions = [...technicianRole.permissions, ...techPermissions];
+  const updatedTechPermissions = [
+    ...technicianRole.permissions,
+    ...techPermissions,
+  ];
   technicianRole.permissions = [...new Set(updatedTechPermissions)];
-  
+
   await roleRepository.save(technicianRole);
   console.log('✅ Đã thêm task permissions cho technician role');
 
   // Lấy hoặc tạo supervisor role
   let supervisorRole = await roleRepository.findOne({
-    where: { name: 'supervisor' }
+    where: { name: 'supervisor' },
   });
 
   if (!supervisorRole) {
     supervisorRole = roleRepository.create({
       name: 'supervisor',
       description: 'Giám sát viên - Có thể tạo và giao tasks',
-      permissions: []
+      permissions: [],
     });
   }
 
@@ -75,9 +78,12 @@ export async function seedTaskPermissions(dataSource: DataSource) {
     Permission.TASK_ASSIGN,
   ];
 
-  const updatedSupervisorPermissions = [...supervisorRole.permissions, ...supervisorPermissions];
+  const updatedSupervisorPermissions = [
+    ...supervisorRole.permissions,
+    ...supervisorPermissions,
+  ];
   supervisorRole.permissions = [...new Set(updatedSupervisorPermissions)];
-  
+
   await roleRepository.save(supervisorRole);
   console.log('✅ Đã thêm task permissions cho supervisor role');
 }

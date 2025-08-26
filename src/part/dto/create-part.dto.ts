@@ -1,10 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsBoolean, IsIn } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsNumber,
+  Min,
+  IsBoolean,
+  IsIn,
+} from 'class-validator';
 
 export class CreatePartDto {
   @ApiProperty({
     description: 'Tên của part',
-    example: 'Motor DC 12V'
+    example: 'Motor DC 12V',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +20,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'Mô tả chi tiết',
-    example: 'Motor DC 12V, 100W, chống nước IP65'
+    example: 'Motor DC 12V, 100W, chống nước IP65',
   })
   @IsString()
   @IsOptional()
@@ -20,7 +28,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'Mã part',
-    example: 'MOT-DC-12V-001'
+    example: 'MOT-DC-12V-001',
   })
   @IsString()
   @IsOptional()
@@ -28,7 +36,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'Đường dẫn hình ảnh',
-    example: '/images/parts/motor-dc-12v.jpg'
+    example: '/images/parts/motor-dc-12v.jpg',
   })
   @IsString()
   @IsOptional()
@@ -37,7 +45,7 @@ export class CreatePartDto {
   @ApiPropertyOptional({
     description: 'Giá tiền',
     example: 150000,
-    default: 0
+    default: 0,
   })
   @IsNumber()
   @Min(0)
@@ -47,7 +55,7 @@ export class CreatePartDto {
   @ApiPropertyOptional({
     description: 'Đơn vị tiền tệ',
     example: 'VND',
-    default: 'VND'
+    default: 'VND',
   })
   @IsString()
   @IsOptional()
@@ -57,7 +65,7 @@ export class CreatePartDto {
     description: 'Loại đặt hàng',
     example: 'material',
     enum: ['material', 'mro', 'self-made'],
-    default: 'material'
+    default: 'material',
   })
   @IsString()
   @IsIn(['material', 'mro', 'self-made'])
@@ -67,7 +75,7 @@ export class CreatePartDto {
   @ApiPropertyOptional({
     description: 'Đơn vị tính',
     example: 'pcs',
-    default: 'pcs'
+    default: 'pcs',
   })
   @IsString()
   @IsOptional()
@@ -76,7 +84,7 @@ export class CreatePartDto {
   @ApiPropertyOptional({
     description: 'Có quản lý chi tiết hay không',
     example: true,
-    default: false
+    default: false,
   })
   @IsBoolean()
   @IsOptional()
@@ -85,7 +93,7 @@ export class CreatePartDto {
   @ApiPropertyOptional({
     description: 'Số lượng tồn kho an toàn',
     example: 10,
-    default: 0
+    default: 0,
   })
   @IsNumber()
   @Min(0)
@@ -94,7 +102,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'ID của dự án',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()
@@ -102,7 +110,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'ID của nhà cung cấp',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()
@@ -110,7 +118,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'ID của vị trí mặc định',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()
@@ -118,7 +126,7 @@ export class CreatePartDto {
 
   @ApiPropertyOptional({
     description: 'ID của jig (nếu part thuộc về jig)',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsString()
   @IsOptional()

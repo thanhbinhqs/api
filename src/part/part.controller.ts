@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { PartService } from './part.service';
 import { CreatePartDto } from './dto/create-part.dto';
 import { UpdatePartDto } from './dto/update-part.dto';
@@ -64,7 +79,11 @@ export class PartController {
   @ApiOperation({ summary: 'Cập nhật thông tin part với version checking' })
   @ApiResponse({ status: 200, description: 'Part đã được cập nhật' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy part' })
-  @ApiResponse({ status: 409, description: 'Conflict - Tên/mã part đã tồn tại hoặc dữ liệu đã được cập nhật bởi người khác' })
+  @ApiResponse({
+    status: 409,
+    description:
+      'Conflict - Tên/mã part đã tồn tại hoặc dữ liệu đã được cập nhật bởi người khác',
+  })
   update(@Param('id') id: string, @Body() updatePartDto: UpdatePartDto) {
     return this.partService.update(id, updatePartDto);
   }
@@ -80,7 +99,9 @@ export class PartController {
 
   @Post(':id/update-stock')
   @HasPermission(Permission.PART_UPDATE)
-  @ApiOperation({ summary: 'Cập nhật lại số lượng tồn kho từ lịch sử nhập/xuất' })
+  @ApiOperation({
+    summary: 'Cập nhật lại số lượng tồn kho từ lịch sử nhập/xuất',
+  })
   @ApiResponse({ status: 200, description: 'Tồn kho đã được cập nhật' })
   @ApiResponse({ status: 404, description: 'Không tìm thấy part' })
   updateStock(@Param('id') id: string) {

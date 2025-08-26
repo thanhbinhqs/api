@@ -1,4 +1,9 @@
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
@@ -8,7 +13,9 @@ import { UserService } from '../user/user.service';
     origin: '*',
   },
 })
-export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
   private userConnections = new Map<string, Socket[]>();
 
@@ -48,13 +55,13 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
   sendToUser(userId: string, event: string, data: any) {
     const connections = this.userConnections.get(userId);
     if (connections) {
-      connections.forEach(client => client.emit(event, data));
+      connections.forEach((client) => client.emit(event, data));
     }
   }
 
   async sendToRole(role: string, event: string, data: any) {
     const users = await this.userService.findUsersByRole(role);
-    users?.forEach(user => {
+    users?.forEach((user) => {
       if (user?.id) {
         this.sendToUser(user.id, event, data);
       }

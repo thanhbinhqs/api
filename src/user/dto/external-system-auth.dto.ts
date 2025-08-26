@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsBoolean, IsDateString, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsBoolean,
+  IsDateString,
+  IsObject,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateExternalSystemAuthDto {
@@ -31,7 +37,7 @@ export class CreateExternalSystemAuthDto {
 
   @IsOptional()
   @IsDateString()
-  @Transform(({ value }) => value ? new Date(value) : undefined)
+  @Transform(({ value }) => (value ? new Date(value) : undefined))
   expiresAt?: Date;
 
   @IsOptional()

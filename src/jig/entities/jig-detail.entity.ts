@@ -1,82 +1,81 @@
-import { BaseEntity } from "src/common/entities/base-entity"
-import { Column, Entity, ManyToOne, OneToMany } from "typeorm"
-import { Jig } from "./jig.entity"
-import { Vendor } from "src/meta/entities/vendor.entity";
-import { Line } from "src/meta/entities/line.entity";
-import { Location } from "src/meta/entities/location.entity";
-import { PartDetail } from "src/part/entities/part-detail.entity";
-import { InOutHistory } from "src/meta/entities/inout-history.entity";
+import { BaseEntity } from 'src/common/entities/base-entity';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Jig } from './jig.entity';
+import { Vendor } from 'src/meta/entities/vendor.entity';
+import { Line } from 'src/meta/entities/line.entity';
+import { Location } from 'src/meta/entities/location.entity';
+import { PartDetail } from 'src/part/entities/part-detail.entity';
+import { InOutHistory } from 'src/meta/entities/inout-history.entity';
 
 export enum JigStatus {
-    NEW = "new",
-    STORAGE = "storage",
-    LINE = "line",
-    REPAIR = "repair",
-    SCRAP = "scrap",
-    VENDOR = "vendor"
+  NEW = 'new',
+  STORAGE = 'storage',
+  LINE = 'line',
+  REPAIR = 'repair',
+  SCRAP = 'scrap',
+  VENDOR = 'vendor',
 }
 
 @Entity('jig-details')
 export class JigDetail extends BaseEntity {
+  // relationship to jig
+  @ManyToOne(() => Jig, (jig) => jig.details, { nullable: false })
+  jig: Jig;
 
-    // relationship to jig
-    @ManyToOne(() => Jig, (jig) => jig.details, { nullable: false })
-    jig: Jig;
+  //automatic code generation by system
+  @Column()
+  code: string;
 
+  //code is interfaced from external system
+  @Column({ nullable: true })
+  mesCode?: string;
 
-    //automatic code generation by system
-    @Column()
-    code: string;
+  @Column({ nullable: true })
+  description?: string;
 
-    //code is interfaced from external system
-    @Column({ nullable: true})
-    mesCode?: string;
+  @Column({
+    default: JigStatus.NEW,
+    transformer: {
+      to: (value: JigStatus) => value,
+      from: (value: string) => value as JigStatus,
+    },
+  })
+  status: JigStatus = JigStatus.NEW;
 
-    @Column({ nullable: true })
-    description?: string;
+  //location can be a line, location, vendor with relationship
+  @ManyToOne(() => Location, (location) => location.jigDetails, {
+    nullable: true,
+  })
+  location?: Location;
 
+  @ManyToOne(() => Line, (line) => line.jigDetails, { nullable: true })
+  line?: Line;
 
-    @Column({
-        default: JigStatus.NEW,
-        transformer: {
-            to: (value: JigStatus) => value,
-            from: (value: string) => value as JigStatus
-        }
-    })
-    status: JigStatus = JigStatus.NEW;
+  @ManyToOne(() => Vendor, (vendor) => vendor.jigDetails, { nullable: true })
+  vendor?: Vendor;
 
-    //location can be a line, location, vendor with relationship
-    @ManyToOne(() => Location, location => location.jigDetails, { nullable: true })
-    location?: Location;
+  // Lưu vị trí mặc định để có thể khôi phục khi cần
+  @ManyToOne(() => Location, { nullable: true })
+  defaultLocation?: Location;
 
-    @ManyToOne(() => Line, line => line.jigDetails, { nullable: true })
-    line?: Line;
+  @ManyToOne(() => Line, { nullable: true })
+  defaultLine?: Line;
 
-    @ManyToOne(() => Vendor, vendor => vendor.jigDetails, { nullable: true })
-    vendor?: Vendor;
+  @ManyToOne(() => Vendor, { nullable: true })
+  defaultVendor?: Vendor;
 
-    // Lưu vị trí mặc định để có thể khôi phục khi cần
-    @ManyToOne(() => Location, { nullable: true })
-    defaultLocation?: Location;
+  //relationship to part details
+  @OneToMany(() => PartDetail, (partDetail) => partDetail.jigDetail)
+  partDetails: PartDetail[];
 
-    @ManyToOne(() => Line, { nullable: true })
-    defaultLine?: Line;
+  //latest maintenance date
+  @Column({ nullable: true })
+  lastMaintenanceDate?: Date;
 
-    @ManyToOne(() => Vendor, { nullable: true })
-    defaultVendor?: Vendor;
+  //inout history relationship
+  @OneToMany(() => InOutHistory, (inOutHistory) => inOutHistory.jigDetail)
+  inOutHistories: InOutHistory[];
 
-    //relationship to part details
-    @OneToMany(() => PartDetail, partDetail => partDetail.jigDetail)
-    partDetails: PartDetail[];
-
-    //latest maintenance date
-    @Column({ nullable: true })
-    lastMaintenanceDate?: Date;
-
-    //inout history relationship
-    @OneToMany(() => InOutHistory, inOutHistory => inOutHistory.jigDetail)
-    inOutHistories: InOutHistory[];
-
-    @Column({ nullable: true })
-    mechanicalVersion?: string;
+  @Column({ nullable: true })
+  mechanicalVersion?: string;
 }

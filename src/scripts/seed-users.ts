@@ -27,7 +27,7 @@ async function seedUsers() {
   process.exit(0);
 }
 
-seedUsers().catch(err => {
+seedUsers().catch((err) => {
   console.error('Error seeding users:', err);
   process.exit(1);
 });

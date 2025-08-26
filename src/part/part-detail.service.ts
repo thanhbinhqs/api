@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere, Not, In } from 'typeorm';
 import { CreatePartDetailDto } from './dto/create-part-detail.dto';
@@ -29,26 +33,50 @@ export class PartDetailService {
     const partDetail = this.partDetailRepository.create({
       ...createPartDetailDto,
       part: { id: createPartDetailDto.partId },
-      location: createPartDetailDto.locationId ? { id: createPartDetailDto.locationId } : undefined,
-      jigDetail: createPartDetailDto.jigDetailId ? { id: createPartDetailDto.jigDetailId } : undefined,
-      purchaseDate: createPartDetailDto.purchaseDate ? new Date(createPartDetailDto.purchaseDate) : undefined,
-      warrantyExpiration: createPartDetailDto.warrantyExpiration ? new Date(createPartDetailDto.warrantyExpiration) : undefined,
-      lastMaintenanceDate: createPartDetailDto.lastMaintenanceDate ? new Date(createPartDetailDto.lastMaintenanceDate) : undefined,
-      nextMaintenanceDate: createPartDetailDto.nextMaintenanceDate ? new Date(createPartDetailDto.nextMaintenanceDate) : undefined,
+      location: createPartDetailDto.locationId
+        ? { id: createPartDetailDto.locationId }
+        : undefined,
+      jigDetail: createPartDetailDto.jigDetailId
+        ? { id: createPartDetailDto.jigDetailId }
+        : undefined,
+      purchaseDate: createPartDetailDto.purchaseDate
+        ? new Date(createPartDetailDto.purchaseDate)
+        : undefined,
+      warrantyExpiration: createPartDetailDto.warrantyExpiration
+        ? new Date(createPartDetailDto.warrantyExpiration)
+        : undefined,
+      lastMaintenanceDate: createPartDetailDto.lastMaintenanceDate
+        ? new Date(createPartDetailDto.lastMaintenanceDate)
+        : undefined,
+      nextMaintenanceDate: createPartDetailDto.nextMaintenanceDate
+        ? new Date(createPartDetailDto.nextMaintenanceDate)
+        : undefined,
     });
 
     const savedPartDetail = await this.partDetailRepository.save(partDetail);
-    
+
     // Cập nhật stock của Part nếu isDetailed = true
     await this.updatePartStockIfDetailed(createPartDetailDto.partId);
-    
+
     return savedPartDetail;
   }
 
-  async findAll(filterDto: PartDetailFilterDto): Promise<PaginatedResult<PartDetail>> {
-    const { page = 1, limit = 10, search, serialNumber, status, partId, locationId, jigDetailId } = filterDto;
-    
-    const queryBuilder = this.partDetailRepository.createQueryBuilder('partDetail')
+  async findAll(
+    filterDto: PartDetailFilterDto,
+  ): Promise<PaginatedResult<PartDetail>> {
+    const {
+      page = 1,
+      limit = 10,
+      search,
+      serialNumber,
+      status,
+      partId,
+      locationId,
+      jigDetailId,
+    } = filterDto;
+
+    const queryBuilder = this.partDetailRepository
+      .createQueryBuilder('partDetail')
       .leftJoinAndSelect('partDetail.part', 'part')
       .leftJoinAndSelect('partDetail.location', 'location')
       .leftJoinAndSelect('partDetail.jigDetail', 'jigDetail');
@@ -56,12 +84,14 @@ export class PartDetailService {
     if (search) {
       queryBuilder.where(
         '(partDetail.serialNumber ILIKE :search OR partDetail.notes ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
     if (serialNumber) {
-      queryBuilder.andWhere('partDetail.serialNumber ILIKE :serialNumber', { serialNumber: `%${serialNumber}%` });
+      queryBuilder.andWhere('partDetail.serialNumber ILIKE :serialNumber', {
+        serialNumber: `%${serialNumber}%`,
+      });
     }
 
     if (status) {
@@ -73,11 +103,15 @@ export class PartDetailService {
     }
 
     if (locationId) {
-      queryBuilder.andWhere('partDetail.location.id = :locationId', { locationId });
+      queryBuilder.andWhere('partDetail.location.id = :locationId', {
+        locationId,
+      });
     }
 
     if (jigDetailId) {
-      queryBuilder.andWhere('partDetail.jigDetail.id = :jigDetailId', { jigDetailId });
+      queryBuilder.andWhere('partDetail.jigDetail.id = :jigDetailId', {
+        jigDetailId,
+      });
     }
 
     const skip = (page - 1) * limit;
@@ -116,13 +150,18 @@ export class PartDetailService {
     });
 
     if (!partDetail) {
-      throw new NotFoundException('Không tìm thấy part detail với số serial này');
+      throw new NotFoundException(
+        'Không tìm thấy part detail với số serial này',
+      );
     }
 
     return partDetail;
   }
 
-  async update(id: string, updatePartDetailDto: UpdatePartDetailDto): Promise<PartDetail> {
+  async update(
+    id: string,
+    updatePartDetailDto: UpdatePartDetailDto,
+  ): Promise<PartDetail> {
     const partDetail = await this.findOne(id);
     const oldStatus = partDetail.status;
 
@@ -132,8 +171,13 @@ export class PartDetailService {
     }
 
     // Kiểm tra serial number đã tồn tại (trừ chính nó)
-    if (updatePartDetailDto.serialNumber && updatePartDetailDto.serialNumber !== partDetail.serialNumber) {
-      if (await this.isSerialNumberExists(updatePartDetailDto.serialNumber, id)) {
+    if (
+      updatePartDetailDto.serialNumber &&
+      updatePartDetailDto.serialNumber !== partDetail.serialNumber
+    ) {
+      if (
+        await this.isSerialNumberExists(updatePartDetailDto.serialNumber, id)
+      ) {
         throw new ConflictException('Số serial đã tồn tại');
       }
     }
@@ -143,37 +187,52 @@ export class PartDetailService {
     const updateData = {
       ...updateDataWithoutVersion,
       version: newVersion,
-      part: updatePartDetailDto.partId ? { id: updatePartDetailDto.partId } : undefined,
-      location: updatePartDetailDto.locationId ? { id: updatePartDetailDto.locationId } : undefined,
-      purchaseDate: updatePartDetailDto.purchaseDate ? new Date(updatePartDetailDto.purchaseDate) : undefined,
-      warrantyExpiration: updatePartDetailDto.warrantyExpiration ? new Date(updatePartDetailDto.warrantyExpiration) : undefined,
-      lastMaintenanceDate: updatePartDetailDto.lastMaintenanceDate ? new Date(updatePartDetailDto.lastMaintenanceDate) : undefined,
-      nextMaintenanceDate: updatePartDetailDto.nextMaintenanceDate ? new Date(updatePartDetailDto.nextMaintenanceDate) : undefined,
+      part: updatePartDetailDto.partId
+        ? { id: updatePartDetailDto.partId }
+        : undefined,
+      location: updatePartDetailDto.locationId
+        ? { id: updatePartDetailDto.locationId }
+        : undefined,
+      purchaseDate: updatePartDetailDto.purchaseDate
+        ? new Date(updatePartDetailDto.purchaseDate)
+        : undefined,
+      warrantyExpiration: updatePartDetailDto.warrantyExpiration
+        ? new Date(updatePartDetailDto.warrantyExpiration)
+        : undefined,
+      lastMaintenanceDate: updatePartDetailDto.lastMaintenanceDate
+        ? new Date(updatePartDetailDto.lastMaintenanceDate)
+        : undefined,
+      nextMaintenanceDate: updatePartDetailDto.nextMaintenanceDate
+        ? new Date(updatePartDetailDto.nextMaintenanceDate)
+        : undefined,
     };
 
     const result = await this.partDetailRepository.update(
       { id, version: updatePartDetailDto.version }, // WHERE clause với version check
-      updateData
+      updateData,
     );
 
     if (result.affected === 0) {
       throw new OptimisticLockingException('PartDetail', id);
     }
-    
+
     // Cập nhật stock của Part nếu status thay đổi và Part có isDetailed = true
-    if (updatePartDetailDto.status && updatePartDetailDto.status !== oldStatus) {
+    if (
+      updatePartDetailDto.status &&
+      updatePartDetailDto.status !== oldStatus
+    ) {
       await this.updatePartStockIfDetailed(partDetail.part.id);
     }
-    
+
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
     const partDetail = await this.findOne(id);
     const partId = partDetail.part.id;
-    
+
     await this.partDetailRepository.softDelete(id);
-    
+
     // Cập nhật stock của Part sau khi xóa PartDetail
     await this.updatePartStockIfDetailed(partId);
   }
@@ -185,7 +244,11 @@ export class PartDetailService {
     });
   }
 
-  async updateStatusBatch(partDetailIds: string[], newStatus: string, versions?: string[]): Promise<void> {
+  async updateStatusBatch(
+    partDetailIds: string[],
+    newStatus: string,
+    versions?: string[],
+  ): Promise<void> {
     // Lấy tất cả part details và part ids liên quan
     const partDetails = await this.partDetailRepository.find({
       where: { id: In(partDetailIds) },
@@ -203,11 +266,13 @@ export class PartDetailService {
     // Nếu có versions, kiểm tra từng version
     if (versions && versions.length > 0) {
       if (versions.length !== partDetailIds.length) {
-        throw new ConflictException('Số lượng versions phải bằng số lượng part detail IDs');
+        throw new ConflictException(
+          'Số lượng versions phải bằng số lượng part detail IDs',
+        );
       }
 
       for (let i = 0; i < partDetails.length; i++) {
-        const partDetail = partDetails.find(pd => pd.id === partDetailIds[i]);
+        const partDetail = partDetails.find((pd) => pd.id === partDetailIds[i]);
         if (partDetail && partDetail.version !== versions[i]) {
           throw new OptimisticLockingException('PartDetail', partDetail.id);
         }
@@ -218,14 +283,14 @@ export class PartDetailService {
     for (const partDetail of partDetails) {
       const newVersion = uuidv4();
       const result = await this.partDetailRepository.update(
-        { 
+        {
           id: partDetail.id,
-          ...(versions ? { version: partDetail.version } : {})
+          ...(versions ? { version: partDetail.version } : {}),
         },
-        { 
+        {
           status: newStatus as any,
-          version: newVersion
-        }
+          version: newVersion,
+        },
       );
 
       if (versions && result.affected === 0) {
@@ -234,20 +299,29 @@ export class PartDetailService {
     }
 
     // Cập nhật stock cho tất cả parts liên quan
-    const partIds = [...new Set(partDetails.map(pd => pd.part.id))];
+    const partIds = [...new Set(partDetails.map((pd) => pd.part.id))];
     for (const partId of partIds) {
       await this.updatePartStockIfDetailed(partId);
     }
   }
 
-  async batchUpdateStatus(batchUpdateDto: BatchUpdatePartDetailStatusDto): Promise<{
+  async batchUpdateStatus(
+    batchUpdateDto: BatchUpdatePartDetailStatusDto,
+  ): Promise<{
     success: string[];
     failed: { id: string; error: string }[];
     total: number;
     successCount: number;
     failedCount: number;
   }> {
-    const { partDetailIds, status, notes, locationId, jigDetailId, saveAsDefault } = batchUpdateDto;
+    const {
+      partDetailIds,
+      status,
+      notes,
+      locationId,
+      jigDetailId,
+      saveAsDefault,
+    } = batchUpdateDto;
     const results = {
       success: [] as string[],
       failed: [] as { id: string; error: string }[],
@@ -257,20 +331,25 @@ export class PartDetailService {
     // Kiểm tra tất cả Part Details có tồn tại không
     const partDetails = await this.partDetailRepository.find({
       where: { id: In(partDetailIds) },
-      relations: ['location', 'jigDetail', 'defaultLocation', 'defaultJigDetail'],
+      relations: [
+        'location',
+        'jigDetail',
+        'defaultLocation',
+        'defaultJigDetail',
+      ],
     });
 
-    const foundIds = partDetails.map(pd => pd.id);
-    const notFoundIds = partDetailIds.filter(id => !foundIds.includes(id));
+    const foundIds = partDetails.map((pd) => pd.id);
+    const notFoundIds = partDetailIds.filter((id) => !foundIds.includes(id));
 
     // Thêm các ID không tìm thấy vào failed
-    notFoundIds.forEach(id => {
+    notFoundIds.forEach((id) => {
       results.failed.push({ id, error: 'Part Detail không tồn tại' });
     });
 
     // Validate location và jigDetail nếu có
-    let location = null;
-    let jigDetail = null;
+    const location = null;
+    const jigDetail = null;
 
     if (locationId) {
       // Import và inject Location repository nếu cần
@@ -296,7 +375,7 @@ export class PartDetailService {
         }
 
         partDetail.status = status;
-        
+
         if (notes) {
           partDetail.notes = notes;
         }
@@ -317,9 +396,9 @@ export class PartDetailService {
         await this.partDetailRepository.save(partDetail);
         results.success.push(partDetail.id);
       } catch (error) {
-        results.failed.push({ 
-          id: partDetail.id, 
-          error: error.message || 'Lỗi không xác định' 
+        results.failed.push({
+          id: partDetail.id,
+          error: error.message || 'Lỗi không xác định',
         });
       }
     }
@@ -331,17 +410,21 @@ export class PartDetailService {
     };
   }
 
-  async setDefaultLocation(partDetailId: string, locationId?: string, jigDetailId?: string): Promise<PartDetail> {
+  async setDefaultLocation(
+    partDetailId: string,
+    locationId?: string,
+    jigDetailId?: string,
+  ): Promise<PartDetail> {
     const partDetail = await this.findOne(partDetailId);
-    
+
     if (locationId) {
       partDetail.defaultLocation = { id: locationId } as any;
     }
-    
+
     if (jigDetailId) {
       partDetail.defaultJigDetail = { id: jigDetailId } as any;
     }
-    
+
     return await this.partDetailRepository.save(partDetail);
   }
 
@@ -352,7 +435,9 @@ export class PartDetailService {
     });
 
     if (!partDetail) {
-      throw new NotFoundException(`Part Detail với ID ${partDetailId} không tồn tại`);
+      throw new NotFoundException(
+        `Part Detail với ID ${partDetailId} không tồn tại`,
+      );
     }
 
     if (partDetail.defaultLocation) {
@@ -366,13 +451,18 @@ export class PartDetailService {
     return await this.partDetailRepository.save(partDetail);
   }
 
-  private async isSerialNumberExists(serialNumber: string, excludeId?: string): Promise<boolean> {
+  private async isSerialNumberExists(
+    serialNumber: string,
+    excludeId?: string,
+  ): Promise<boolean> {
     const whereCondition: FindOptionsWhere<PartDetail> = { serialNumber };
     if (excludeId) {
       whereCondition.id = Not(excludeId);
     }
-    
-    const count = await this.partDetailRepository.count({ where: whereCondition });
+
+    const count = await this.partDetailRepository.count({
+      where: whereCondition,
+    });
     return count > 0;
   }
 
@@ -388,16 +478,17 @@ export class PartDetailService {
       }
 
       // Đếm theo status của PartDetail
-      const availableCount = part.details.filter(detail => 
-        detail.status === 'available'
+      const availableCount = part.details.filter(
+        (detail) => detail.status === 'available',
       ).length;
-      
-      const inUseCount = part.details.filter(detail => 
-        detail.status === 'in-use'
+
+      const inUseCount = part.details.filter(
+        (detail) => detail.status === 'in-use',
       ).length;
-      
-      const maintenanceCount = part.details.filter(detail => 
-        detail.status === 'maintenance' || detail.status === 'repair'
+
+      const maintenanceCount = part.details.filter(
+        (detail) =>
+          detail.status === 'maintenance' || detail.status === 'repair',
       ).length;
 
       const totalCount = part.details.length;
@@ -420,15 +511,18 @@ export class PartDetailService {
     });
   }
 
-  async updateJigDetail(id: string, jigDetailId: string | null): Promise<PartDetail> {
+  async updateJigDetail(
+    id: string,
+    jigDetailId: string | null,
+  ): Promise<PartDetail> {
     const partDetail = await this.findOne(id);
-    
+
     if (jigDetailId) {
       partDetail.jigDetail = { id: jigDetailId } as any;
     } else {
       partDetail.jigDetail = undefined;
     }
-    
+
     return await this.partDetailRepository.save(partDetail);
   }
 }

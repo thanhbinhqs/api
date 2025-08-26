@@ -8,7 +8,6 @@ import { ILike, Repository } from 'typeorm';
 import type { Request } from 'express';
 import { SystemSettingKey } from '../common/constants/system-settings.constants';
 import { Utils } from 'src/common/services/utils';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UserResponseDto } from 'src/common/dto/user-response.dto';
 import moment from 'moment';
@@ -34,11 +33,13 @@ export class AuthService {
     if (!user) throw new BadRequestException('Username is not found');
 
     // Check login attempts
-    const maxAttempts =
+    const maxAttempts = Number(
       this.request.systemSettings[SystemSettingKey.AUTH_MAX_LOGIN_ATTEMPTS] ||
-      5;
-    const lockoutDuration =
-      this.request.systemSettings[SystemSettingKey.AUTH_LOCKOUT_DURATION] || 30;
+      5
+    );
+    const lockoutDuration = Number(
+      this.request.systemSettings[SystemSettingKey.AUTH_LOCKOUT_DURATION] || 30
+    );
 
     if (user.failedLoginAttempts >= maxAttempts && user.lastFailedLogin) {
       const lastAttempt = new Date(user.lastFailedLogin);
@@ -75,18 +76,18 @@ export class AuthService {
       username: user.username,
       tokenVersion: user.tokenVersion,
     };
-    const jwtExpiry =
-      this.request.systemSettings[SystemSettingKey.SECURITY_JWT_EXPIRY] || '8';
-    const algorithm =
+    const jwtExpiry = Number(
+      this.request.systemSettings[SystemSettingKey.SECURITY_JWT_EXPIRY] || '8'
+    );
+    const algorithm = 
       this.request.systemSettings[SystemSettingKey.SECURITY_JWT_ALGORITHM] ||
       'HS256';
-      
 
     return {
       token: this.jwtService.sign(payload, {
         expiresIn: `${jwtExpiry}h`,
         secret: process.env.JWT_SECRET,
-        algorithm: algorithm,
+        algorithm: algorithm as any,
       }),
       expireAt: moment().add(jwtExpiry, 'hours').toDate(),
       user: new UserResponseDto(user),

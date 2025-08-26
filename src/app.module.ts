@@ -30,7 +30,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     SystemSettingsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         secret: configService.get('JWT_SECRET'),
       }),
       inject: [ConfigService],
@@ -53,7 +53,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: (configService: ConfigService) => ({
         store: createKeyv(configService.get('REDIS_URL')),
         ttl: 5000, // 5 seconds
       }),

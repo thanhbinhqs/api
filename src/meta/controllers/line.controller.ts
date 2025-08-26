@@ -58,7 +58,9 @@ export class LineController {
     description: 'Danh sách lines',
     type: PaginatedResult<Line>,
   })
-  async findAll(@Query() filterDto: LineFilterDto): Promise<PaginatedResult<Line>> {
+  async findAll(
+    @Query() filterDto: LineFilterDto,
+  ): Promise<PaginatedResult<Line>> {
     return this.lineService.findAllLines(filterDto);
   }
 
@@ -102,7 +104,9 @@ export class LineController {
     description: 'Danh sách lines theo zone',
     type: [Line],
   })
-  async findByZone(@Param('zoneId', ParseUUIDPipe) zoneId: string): Promise<Line[]> {
+  async findByZone(
+    @Param('zoneId', ParseUUIDPipe) zoneId: string,
+  ): Promise<Line[]> {
     return this.lineService.findLinesByZone(zoneId);
   }
 
@@ -160,7 +164,9 @@ export class LineController {
     status: 404,
     description: 'Không tìm thấy line',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.lineService.deleteLine(id);
     return { message: 'Line đã được xóa thành công' };
   }

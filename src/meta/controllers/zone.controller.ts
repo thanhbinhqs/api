@@ -59,7 +59,9 @@ export class ZoneController {
     description: 'Danh sách zones',
     type: PaginatedResult<Zone>,
   })
-  async findAll(@Query() filterDto: ZoneFilterDto): Promise<PaginatedResult<Zone>> {
+  async findAll(
+    @Query() filterDto: ZoneFilterDto,
+  ): Promise<PaginatedResult<Zone>> {
     return this.zoneService.findAllZones(filterDto);
   }
 
@@ -177,7 +179,9 @@ export class ZoneController {
     status: 404,
     description: 'Không tìm thấy zone',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.zoneService.deleteZone(id);
     return { message: 'Zone đã được xóa thành công' };
   }

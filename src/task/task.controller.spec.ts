@@ -3,7 +3,12 @@ import { TaskController } from './task.controller';
 import { TaskService } from './task.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { PermissionGuard } from '../common/guards/permission.guard';
-import { TaskType, TaskPriority, TaskStatus, AssigneeType } from './entities/task.entity';
+import {
+  TaskType,
+  TaskPriority,
+  TaskStatus,
+  AssigneeType,
+} from './entities/task.entity';
 
 describe('TaskController', () => {
   let controller: TaskController;
@@ -129,7 +134,9 @@ describe('TaskController', () => {
       const taskId = 'task-id';
       const completeData = {
         completionNotes: 'Task completed successfully',
-        checklist: [{ id: '1', title: 'Check 1', completed: true, required: true }],
+        checklist: [
+          { id: '1', title: 'Check 1', completed: true, required: true },
+        ],
       };
       const expectedTask = { id: taskId, status: TaskStatus.COMPLETED };
 

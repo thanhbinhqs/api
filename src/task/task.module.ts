@@ -12,17 +12,11 @@ import { NotificationEventService } from '../common/services/notification-event.
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Task,
-      User,
-      Role,
-      Jig,
-      JigDetail
-    ]),
-    FileManagerModule
+    TypeOrmModule.forFeature([Task, User, Role, Jig, JigDetail]),
+    FileManagerModule,
   ],
   controllers: [TaskController],
   providers: [TaskService, NotificationEventService],
-  exports: [TaskService]
+  exports: [TaskService],
 })
 export class TaskModule {}

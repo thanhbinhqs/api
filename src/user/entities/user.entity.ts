@@ -5,9 +5,9 @@ import { Role } from './role.entity';
 import { EncryptionService } from 'src/common/services/encryption.service';
 import { ConfigService } from '@nestjs/config';
 import { DEFAULT_SYSTEM_SETTINGS } from '../../common/constants/system-settings.constants';
-import type { 
-  ExternalSystemAuthInfo, 
-  ExternalSystemAuthNotification 
+import type {
+  ExternalSystemAuthInfo,
+  ExternalSystemAuthNotification,
 } from 'src/common/types/external-system-auth.types';
 
 @Entity({ name: 'users' })
@@ -94,20 +94,18 @@ export class User extends BaseEntity {
       to: (value: ExternalSystemAuthInfo) => {
         if (!value) return null;
         // Mã hóa dữ liệu trước khi lưu
-        const encryptionService = new EncryptionService(
-          new ConfigService(),
-          { systemSettings: DEFAULT_SYSTEM_SETTINGS }
-        );
+        const encryptionService = new EncryptionService(new ConfigService(), {
+          systemSettings: DEFAULT_SYSTEM_SETTINGS,
+        });
         return encryptionService.encrypt(value);
       },
       from: (value: string) => {
         if (!value) return null;
         try {
           // Giải mã dữ liệu khi đọc
-          const encryptionService = new EncryptionService(
-            new ConfigService(),
-            { systemSettings: DEFAULT_SYSTEM_SETTINGS }
-          );
+          const encryptionService = new EncryptionService(new ConfigService(), {
+            systemSettings: DEFAULT_SYSTEM_SETTINGS,
+          });
           return encryptionService.decrypt(value);
         } catch (error) {
           console.error('Failed to decrypt external system auth info:', error);

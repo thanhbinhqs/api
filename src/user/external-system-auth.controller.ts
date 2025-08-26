@@ -48,7 +48,9 @@ export class ExternalSystemAuthController {
       createDto.systemName,
       createDto,
     );
-    return { message: 'Thông tin đăng nhập hệ thống bên ngoài đã được cập nhật' };
+    return {
+      message: 'Thông tin đăng nhập hệ thống bên ngoài đã được cập nhật',
+    };
   }
 
   @Get(':systemName')
@@ -60,7 +62,10 @@ export class ExternalSystemAuthController {
     if (!userId) {
       throw new Error('User ID not found');
     }
-    return this.externalSystemAuthService.getExternalSystemAuth(userId, systemName);
+    return this.externalSystemAuthService.getExternalSystemAuth(
+      userId,
+      systemName,
+    );
   }
 
   @Get()
@@ -101,12 +106,17 @@ export class ExternalSystemAuthController {
     if (!userId) {
       throw new Error('User ID not found');
     }
-    await this.externalSystemAuthService.removeExternalSystemAuth(userId, systemName);
+    await this.externalSystemAuthService.removeExternalSystemAuth(
+      userId,
+      systemName,
+    );
     return { message: 'Thông tin đăng nhập hệ thống bên ngoài đã được xóa' };
   }
 
   @Get('notifications/all')
-  async getNotifications(@Req() req: Request): Promise<ExternalSystemAuthNotification[]> {
+  async getNotifications(
+    @Req() req: Request,
+  ): Promise<ExternalSystemAuthNotification[]> {
     const userId = req.user?.id;
     if (!userId) {
       throw new Error('User ID not found');

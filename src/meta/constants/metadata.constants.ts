@@ -16,8 +16,32 @@ export const DRAWING_STATUS = [
 ] as const;
 
 export const DRAWING_REVISIONS = [
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
-  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
 ] as const;
 
 // Jig related constants
@@ -27,7 +51,7 @@ export const JIG_TYPES = [
   { value: 'sw', label: 'Phần mềm' },
 ] as const;
 
-// Part related constants  
+// Part related constants
 export const ORDER_TYPES = [
   { value: 'material', label: 'Vật liệu' },
   { value: 'mro', label: 'MRO' },

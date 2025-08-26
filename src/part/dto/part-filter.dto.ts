@@ -5,7 +5,7 @@ import { BaseFilterDto } from 'src/common/dto/base-filter.dto';
 export class PartFilterDto extends BaseFilterDto {
   @ApiPropertyOptional({
     description: 'Tìm kiếm theo mã part',
-    example: 'MOT-DC'
+    example: 'MOT-DC',
   })
   @IsOptional()
   @IsString()
@@ -14,7 +14,7 @@ export class PartFilterDto extends BaseFilterDto {
   @ApiPropertyOptional({
     description: 'Lọc theo loại đặt hàng',
     example: 'material',
-    enum: ['material', 'mro', 'self-made']
+    enum: ['material', 'mro', 'self-made'],
   })
   @IsOptional()
   @IsString()
@@ -23,7 +23,7 @@ export class PartFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo có quản lý chi tiết hay không',
-    example: true
+    example: true,
   })
   @IsOptional()
   @IsBoolean()
@@ -31,7 +31,7 @@ export class PartFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID dự án',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()
@@ -39,7 +39,7 @@ export class PartFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID nhà cung cấp',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()
@@ -47,7 +47,7 @@ export class PartFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID vị trí mặc định',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()
@@ -55,7 +55,7 @@ export class PartFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID jig',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()

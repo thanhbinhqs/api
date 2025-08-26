@@ -1,5 +1,10 @@
 import { DataSource } from 'typeorm';
-import { JigOrder, JigOrderDetail, JigOrderStatus, JigOrderPriority } from '../entities/jig-order.entity';
+import {
+  JigOrder,
+  JigOrderDetail,
+  JigOrderStatus,
+  JigOrderPriority,
+} from '../entities/jig-order.entity';
 import { User } from 'src/user/entities/user.entity';
 import { JigDetail } from '../entities/jig-detail.entity';
 import { Location } from 'src/meta/entities/location.entity';
@@ -40,14 +45,14 @@ export async function seedJigOrders(dataSource: DataSource) {
         {
           jigDetail: jigDetails[0],
           quantity: 2,
-          notes: 'Cần kiểm tra trước khi giao'
+          notes: 'Cần kiểm tra trước khi giao',
         },
         {
           jigDetail: jigDetails[1],
           quantity: 1,
-          notes: 'Urgent - cần gấp'
-        }
-      ]
+          notes: 'Urgent - cần gấp',
+        },
+      ],
     },
     {
       orderCode: 'JO202412260002',
@@ -64,9 +69,9 @@ export async function seedJigOrders(dataSource: DataSource) {
         {
           jigDetail: jigDetails[2],
           quantity: 3,
-          notes: 'Để dự phòng'
-        }
-      ]
+          notes: 'Để dự phòng',
+        },
+      ],
     },
     {
       orderCode: 'JO202412260003',
@@ -88,9 +93,9 @@ export async function seedJigOrders(dataSource: DataSource) {
           notes: 'Thay thế khẩn cấp',
           isPrepared: true,
           preparedDate: new Date(),
-          actualQuantity: 1
-        }
-      ]
+          actualQuantity: 1,
+        },
+      ],
     },
     {
       orderCode: 'JO202412260004',
@@ -116,7 +121,7 @@ export async function seedJigOrders(dataSource: DataSource) {
           notes: 'Hoàn thành',
           isPrepared: true,
           preparedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          actualQuantity: 2
+          actualQuantity: 2,
         },
         {
           jigDetail: jigDetails[5],
@@ -124,10 +129,10 @@ export async function seedJigOrders(dataSource: DataSource) {
           notes: 'Hoàn thành',
           isPrepared: true,
           preparedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          actualQuantity: 1
-        }
-      ]
-    }
+          actualQuantity: 1,
+        },
+      ],
+    },
   ];
 
   for (const orderData of sampleOrders) {
@@ -141,15 +146,17 @@ export async function seedJigOrders(dataSource: DataSource) {
       for (const detailData of orderDetails) {
         const orderDetail = jigOrderDetailRepository.create({
           ...detailData,
-          order: savedOrder
+          order: savedOrder,
         });
         await jigOrderDetailRepository.save(orderDetail);
       }
 
       console.log(`✅ Created sample order: ${orderData.orderCode}`);
-
     } catch (error) {
-      console.error(`❌ Error creating order ${orderData.orderCode}:`, error.message);
+      console.error(
+        `❌ Error creating order ${orderData.orderCode}:`,
+        error.message,
+      );
     }
   }
 

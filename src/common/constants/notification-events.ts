@@ -27,12 +27,13 @@ export const NOTIFICATION_EVENTS = {
   // System events
   SYSTEM_SETTINGS_UPDATED: 'system_settings_updated',
   SYSTEM_MAINTENANCE: 'system_maintenance',
-  
+
   // Audit events
   AUDIT_LOG_CREATED: 'audit_log_created',
 } as const;
 
-export type NotificationEvent = typeof NOTIFICATION_EVENTS[keyof typeof NOTIFICATION_EVENTS];
+export type NotificationEvent =
+  (typeof NOTIFICATION_EVENTS)[keyof typeof NOTIFICATION_EVENTS];
 
 export interface NotificationData {
   message: string;

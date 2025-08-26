@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApprovalComment } from '../entities';
@@ -11,7 +15,11 @@ export class ApprovalCommentService {
     private readonly commentRepository: Repository<ApprovalComment>,
   ) {}
 
-  async create(createDto: CreateApprovalCommentDto, userId: string, userName: string): Promise<ApprovalComment> {
+  async create(
+    createDto: CreateApprovalCommentDto,
+    userId: string,
+    userName: string,
+  ): Promise<ApprovalComment> {
     const comment = this.commentRepository.create({
       ...createDto,
       userId,
@@ -41,9 +49,13 @@ export class ApprovalCommentService {
     return comment;
   }
 
-  async update(id: string, updateDto: UpdateApprovalCommentDto, userId: string): Promise<ApprovalComment> {
+  async update(
+    id: string,
+    updateDto: UpdateApprovalCommentDto,
+    userId: string,
+  ): Promise<ApprovalComment> {
     const comment = await this.findById(id);
-    
+
     if (comment.userId !== userId) {
       throw new BadRequestException('You can only edit your own comments');
     }
@@ -56,7 +68,7 @@ export class ApprovalCommentService {
 
   async delete(id: string, userId: string): Promise<void> {
     const comment = await this.findById(id);
-    
+
     if (comment.userId !== userId) {
       throw new BadRequestException('You can only delete your own comments');
     }
@@ -64,7 +76,7 @@ export class ApprovalCommentService {
     // Soft delete
     comment.isActive = false;
     comment.deletedAt = new Date();
-    
+
     await this.commentRepository.save(comment);
   }
 
@@ -76,16 +88,20 @@ export class ApprovalCommentService {
     });
 
     // Tổ chức thành cấu trúc tree
-    const commentMap = new Map<string, ApprovalComment & { replies: ApprovalComment[] }>();
-    const rootComments: (ApprovalComment & { replies: ApprovalComment[] })[] = [];
+    const commentMap = new Map<
+      string,
+      ApprovalComment & { replies: ApprovalComment[] }
+    >();
+    const rootComments: (ApprovalComment & { replies: ApprovalComment[] })[] =
+      [];
 
     // Khởi tạo map
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       commentMap.set(comment.id, { ...comment, replies: [] });
     });
 
     // Tổ chức tree
-    comments.forEach(comment => {
+    comments.forEach((comment) => {
       const commentWithReplies = commentMap.get(comment.id);
       if (comment.parentCommentId) {
         const parent = commentMap.get(comment.parentCommentId);

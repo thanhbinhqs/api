@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { CreateJigDetailDto } from './dto/create-jig-detail.dto';
@@ -20,14 +24,17 @@ export class JigDetailService {
       const jigDetail = this.jigDetailRepository.create(createJigDetailDto);
       return await this.jigDetailRepository.save(jigDetail);
     } catch (error) {
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
+        // Unique violation
         throw new BadRequestException('Jig detail với code này đã tồn tại');
       }
       throw error;
     }
   }
 
-  async findAll(filterDto: JigDetailFilterDto): Promise<PaginatedResult<JigDetail>> {
+  async findAll(
+    filterDto: JigDetailFilterDto,
+  ): Promise<PaginatedResult<JigDetail>> {
     const {
       page = 1,
       limit = 10,
@@ -45,7 +52,8 @@ export class JigDetailService {
       lastMaintenanceDateTo,
     } = filterDto;
 
-    const queryBuilder = this.jigDetailRepository.createQueryBuilder('jigDetail')
+    const queryBuilder = this.jigDetailRepository
+      .createQueryBuilder('jigDetail')
       .leftJoinAndSelect('jigDetail.jig', 'jig')
       .leftJoinAndSelect('jigDetail.location', 'location')
       .leftJoinAndSelect('jigDetail.line', 'line')
@@ -57,7 +65,7 @@ export class JigDetailService {
     if (search) {
       queryBuilder.andWhere(
         '(jigDetail.code ILIKE :search OR jigDetail.mesCode ILIKE :search OR jigDetail.description ILIKE :search OR jig.name ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
@@ -67,11 +75,15 @@ export class JigDetailService {
     }
 
     if (code) {
-      queryBuilder.andWhere('jigDetail.code ILIKE :code', { code: `%${code}%` });
+      queryBuilder.andWhere('jigDetail.code ILIKE :code', {
+        code: `%${code}%`,
+      });
     }
 
     if (mesCode) {
-      queryBuilder.andWhere('jigDetail.mesCode ILIKE :mesCode', { mesCode: `%${mesCode}%` });
+      queryBuilder.andWhere('jigDetail.mesCode ILIKE :mesCode', {
+        mesCode: `%${mesCode}%`,
+      });
     }
 
     if (status) {
@@ -79,7 +91,9 @@ export class JigDetailService {
     }
 
     if (locationId) {
-      queryBuilder.andWhere('jigDetail.locationId = :locationId', { locationId });
+      queryBuilder.andWhere('jigDetail.locationId = :locationId', {
+        locationId,
+      });
     }
 
     if (lineId) {
@@ -91,11 +105,15 @@ export class JigDetailService {
     }
 
     if (lastMaintenanceDateFrom) {
-      queryBuilder.andWhere('jigDetail.lastMaintenanceDate >= :from', { from: lastMaintenanceDateFrom });
+      queryBuilder.andWhere('jigDetail.lastMaintenanceDate >= :from', {
+        from: lastMaintenanceDateFrom,
+      });
     }
 
     if (lastMaintenanceDateTo) {
-      queryBuilder.andWhere('jigDetail.lastMaintenanceDate <= :to', { to: lastMaintenanceDateTo });
+      queryBuilder.andWhere('jigDetail.lastMaintenanceDate <= :to', {
+        to: lastMaintenanceDateTo,
+      });
     }
 
     // Sorting
@@ -120,7 +138,7 @@ export class JigDetailService {
         'vendor',
         'partDetails',
         'partDetails.part',
-        'inOutHistories'
+        'inOutHistories',
       ],
     });
 
@@ -131,14 +149,18 @@ export class JigDetailService {
     return jigDetail;
   }
 
-  async update(id: string, updateJigDetailDto: UpdateJigDetailDto): Promise<JigDetail> {
+  async update(
+    id: string,
+    updateJigDetailDto: UpdateJigDetailDto,
+  ): Promise<JigDetail> {
     const jigDetail = await this.findOne(id);
-    
+
     try {
       Object.assign(jigDetail, updateJigDetailDto);
       return await this.jigDetailRepository.save(jigDetail);
     } catch (error) {
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
+        // Unique violation
         throw new BadRequestException('Jig detail với code này đã tồn tại');
       }
       throw error;
@@ -170,9 +192,14 @@ export class JigDetailService {
     return await this.jigDetailRepository.save(jigDetail);
   }
 
-  async updateLocation(id: string, locationId: string | null, lineId: string | null, vendorId: string | null): Promise<JigDetail> {
+  async updateLocation(
+    id: string,
+    locationId: string | null,
+    lineId: string | null,
+    vendorId: string | null,
+  ): Promise<JigDetail> {
     const jigDetail = await this.findOne(id);
-    
+
     // Reset all locations first
     jigDetail.location = undefined;
     jigDetail.line = undefined;
@@ -193,7 +220,10 @@ export class JigDetailService {
     return await this.jigDetailRepository.save(jigDetail);
   }
 
-  async updateMaintenanceDate(id: string, maintenanceDate: Date): Promise<JigDetail> {
+  async updateMaintenanceDate(
+    id: string,
+    maintenanceDate: Date,
+  ): Promise<JigDetail> {
     const jigDetail = await this.findOne(id);
     jigDetail.lastMaintenanceDate = maintenanceDate;
     return await this.jigDetailRepository.save(jigDetail);
@@ -206,29 +236,44 @@ export class JigDetailService {
     });
   }
 
-  async getJigDetailsNeedingMaintenance(days: number = 30): Promise<JigDetail[]> {
+  async getJigDetailsNeedingMaintenance(
+    days: number = 30,
+  ): Promise<JigDetail[]> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
     return await this.jigDetailRepository
       .createQueryBuilder('jigDetail')
       .leftJoinAndSelect('jigDetail.jig', 'jig')
-      .where('jig.needMaintenance = :needMaintenance', { needMaintenance: true })
+      .where('jig.needMaintenance = :needMaintenance', {
+        needMaintenance: true,
+      })
       .andWhere(
         '(jigDetail.lastMaintenanceDate IS NULL OR jigDetail.lastMaintenanceDate <= :cutoffDate)',
-        { cutoffDate }
+        { cutoffDate },
       )
       .getMany();
   }
 
-  async batchUpdateStatus(batchUpdateDto: BatchUpdateJigDetailStatusDto): Promise<{
+  async batchUpdateStatus(
+    batchUpdateDto: BatchUpdateJigDetailStatusDto,
+  ): Promise<{
     success: string[];
     failed: { id: string; error: string }[];
     total: number;
     successCount: number;
     failedCount: number;
   }> {
-    const { jigDetailIds, status, notes, locationId, lineId, vendorId, saveAsDefault, useDefault } = batchUpdateDto;
+    const {
+      jigDetailIds,
+      status,
+      notes,
+      locationId,
+      lineId,
+      vendorId,
+      saveAsDefault,
+      useDefault,
+    } = batchUpdateDto;
     const results = {
       success: [] as string[],
       failed: [] as { id: string; error: string }[],
@@ -238,14 +283,21 @@ export class JigDetailService {
     // Kiểm tra tất cả Jig Details có tồn tại không
     const jigDetails = await this.jigDetailRepository.find({
       where: { id: In(jigDetailIds) },
-      relations: ['location', 'line', 'vendor', 'defaultLocation', 'defaultLine', 'defaultVendor'],
+      relations: [
+        'location',
+        'line',
+        'vendor',
+        'defaultLocation',
+        'defaultLine',
+        'defaultVendor',
+      ],
     });
 
-    const foundIds = jigDetails.map(jd => jd.id);
-    const notFoundIds = jigDetailIds.filter(id => !foundIds.includes(id));
+    const foundIds = jigDetails.map((jd) => jd.id);
+    const notFoundIds = jigDetailIds.filter((id) => !foundIds.includes(id));
 
     // Thêm các ID không tìm thấy vào failed
-    notFoundIds.forEach(id => {
+    notFoundIds.forEach((id) => {
       results.failed.push({ id, error: 'Jig Detail không tồn tại' });
     });
 
@@ -314,9 +366,9 @@ export class JigDetailService {
         await this.jigDetailRepository.save(jigDetail);
         results.success.push(jigDetail.id);
       } catch (error) {
-        results.failed.push({ 
-          id: jigDetail.id, 
-          error: error.message || 'Lỗi không xác định' 
+        results.failed.push({
+          id: jigDetail.id,
+          error: error.message || 'Lỗi không xác định',
         });
       }
     }
@@ -328,21 +380,26 @@ export class JigDetailService {
     };
   }
 
-  async setDefaultLocations(jigDetailId: string, locationId?: string, lineId?: string, vendorId?: string): Promise<JigDetail> {
+  async setDefaultLocations(
+    jigDetailId: string,
+    locationId?: string,
+    lineId?: string,
+    vendorId?: string,
+  ): Promise<JigDetail> {
     const jigDetail = await this.findOne(jigDetailId);
-    
+
     if (locationId) {
       jigDetail.defaultLocation = { id: locationId } as any;
     }
-    
+
     if (lineId) {
       jigDetail.defaultLine = { id: lineId } as any;
     }
-    
+
     if (vendorId) {
       jigDetail.defaultVendor = { id: vendorId } as any;
     }
-    
+
     return await this.jigDetailRepository.save(jigDetail);
   }
 
@@ -353,7 +410,9 @@ export class JigDetailService {
     });
 
     if (!jigDetail) {
-      throw new NotFoundException(`Jig Detail với ID ${jigDetailId} không tồn tại`);
+      throw new NotFoundException(
+        `Jig Detail với ID ${jigDetailId} không tồn tại`,
+      );
     }
 
     // Khôi phục dựa trên status hiện tại
@@ -361,7 +420,10 @@ export class JigDetailService {
       jigDetail.location = jigDetail.defaultLocation;
     } else if (jigDetail.status === JigStatus.LINE && jigDetail.defaultLine) {
       jigDetail.line = jigDetail.defaultLine;
-    } else if (jigDetail.status === JigStatus.VENDOR && jigDetail.defaultVendor) {
+    } else if (
+      jigDetail.status === JigStatus.VENDOR &&
+      jigDetail.defaultVendor
+    ) {
       jigDetail.vendor = jigDetail.defaultVendor;
     }
 

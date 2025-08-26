@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApprovalStep } from '../entities';
@@ -14,15 +18,15 @@ export class ApprovalStepService {
   async create(createDto: CreateApprovalStepDto): Promise<ApprovalStep> {
     // Kiểm tra step order đã tồn tại trong workflow
     const existingStep = await this.stepRepository.findOne({
-      where: { 
-        workflowId: createDto.workflowId, 
-        stepOrder: createDto.stepOrder 
+      where: {
+        workflowId: createDto.workflowId,
+        stepOrder: createDto.stepOrder,
       },
     });
 
     if (existingStep) {
       throw new BadRequestException(
-        `Step with order ${createDto.stepOrder} already exists in workflow`
+        `Step with order ${createDto.stepOrder} already exists in workflow`,
       );
     }
 
@@ -54,9 +58,12 @@ export class ApprovalStepService {
     return step;
   }
 
-  async update(id: string, updateDto: UpdateApprovalStepDto): Promise<ApprovalStep> {
+  async update(
+    id: string,
+    updateDto: UpdateApprovalStepDto,
+  ): Promise<ApprovalStep> {
     const step = await this.findById(id);
-    
+
     Object.assign(step, updateDto);
     step.updatedAt = new Date();
 
@@ -65,19 +72,22 @@ export class ApprovalStepService {
 
   async delete(id: string): Promise<void> {
     const step = await this.findById(id);
-    
+
     // Soft delete
     step.isActive = false;
     step.deletedAt = new Date();
-    
+
     await this.stepRepository.save(step);
   }
 
-  async reorderSteps(workflowId: string, stepOrders: { stepId: string; order: number }[]): Promise<ApprovalStep[]> {
+  async reorderSteps(
+    workflowId: string,
+    stepOrders: { stepId: string; order: number }[],
+  ): Promise<ApprovalStep[]> {
     const steps = await this.findByWorkflowId(workflowId);
-    
+
     for (const stepOrder of stepOrders) {
-      const step = steps.find(s => s.id === stepOrder.stepId);
+      const step = steps.find((s) => s.id === stepOrder.stepId);
       if (step) {
         step.stepOrder = stepOrder.order;
         await this.stepRepository.save(step);
@@ -89,7 +99,7 @@ export class ApprovalStepService {
 
   async validateWorkflowSteps(workflowId: string): Promise<boolean> {
     const steps = await this.findByWorkflowId(workflowId);
-    
+
     // Kiểm tra có ít nhất 1 step
     if (steps.length === 0) {
       return false;

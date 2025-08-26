@@ -1,4 +1,9 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -7,11 +12,11 @@ export class AuditInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    
+
     if (user && request.body) {
       const method = request.method;
       const now = new Date();
-      
+
       if (method === 'POST') {
         request.body.createdBy = user.id;
         request.body.createdAt = now;
@@ -24,8 +29,10 @@ export class AuditInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         // Log thao tác nếu cần
-        console.log(`User ${user?.id} performed ${request.method} on ${request.url}`);
-      })
+        console.log(
+          `User ${user?.id} performed ${request.method} on ${request.url}`,
+        );
+      }),
     );
   }
 }

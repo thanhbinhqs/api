@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ApprovalWorkflow } from '../entities';
@@ -11,14 +15,18 @@ export class ApprovalWorkflowService {
     private readonly workflowRepository: Repository<ApprovalWorkflow>,
   ) {}
 
-  async create(createDto: CreateApprovalWorkflowDto): Promise<ApprovalWorkflow> {
+  async create(
+    createDto: CreateApprovalWorkflowDto,
+  ): Promise<ApprovalWorkflow> {
     // Kiểm tra code đã tồn tại
     const existingWorkflow = await this.workflowRepository.findOne({
       where: { code: createDto.code },
     });
 
     if (existingWorkflow) {
-      throw new BadRequestException(`Workflow with code ${createDto.code} already exists`);
+      throw new BadRequestException(
+        `Workflow with code ${createDto.code} already exists`,
+      );
     }
 
     const workflow = this.workflowRepository.create(createDto);
@@ -59,9 +67,12 @@ export class ApprovalWorkflowService {
     return workflow;
   }
 
-  async update(id: string, updateDto: UpdateApprovalWorkflowDto): Promise<ApprovalWorkflow> {
+  async update(
+    id: string,
+    updateDto: UpdateApprovalWorkflowDto,
+  ): Promise<ApprovalWorkflow> {
     const workflow = await this.findById(id);
-    
+
     Object.assign(workflow, updateDto);
     workflow.updatedAt = new Date();
 
@@ -70,11 +81,11 @@ export class ApprovalWorkflowService {
 
   async delete(id: string): Promise<void> {
     const workflow = await this.findById(id);
-    
+
     // Soft delete
     workflow.isActive = false;
     workflow.deletedAt = new Date();
-    
+
     await this.workflowRepository.save(workflow);
   }
 

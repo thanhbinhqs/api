@@ -7,6 +7,9 @@ import { LineFilterDto } from '../dto/line/line-filter.dto';
 import { Line } from '../entities/line.entity';
 import { PaginatedResult } from 'src/common';
 import { NotFoundException } from '@nestjs/common';
+import { TestModuleBuilder } from '../../test-utils/test-module.builder';
+import { User } from '../../user/entities/user.entity';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 describe('LineController', () => {
   let controller: LineController;
@@ -24,15 +27,22 @@ describe('LineController', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [LineController],
-      providers: [
-        {
-          provide: LineService,
-          useValue: mockLineService,
+    const module: TestingModule = await new TestModuleBuilder()
+      .addController(LineController)
+      .addProvider({
+        provide: LineService,
+        useValue: mockLineService,
+      })
+      .addProvider({
+        provide: JwtAuthGuard,
+        useValue: {
+          canActivate: jest.fn().mockReturnValue(true),
         },
-      ],
-    }).compile();
+      })
+      .addMockRepository(User)
+      .addMockJwtService()
+      .addMockReflector()
+      .build();
 
     controller = module.get<LineController>(LineController);
     service = module.get<LineService>(LineService);
@@ -137,7 +147,7 @@ describe('LineController', () => {
       mockLineService.findLineBySlug.mockResolvedValue(null);
 
       await expect(controller.findBySlug(slug)).rejects.toThrow(
-        new NotFoundException(`Line với slug "${slug}" không tồn tại`)
+        new NotFoundException(`Line với slug "${slug}" không tồn tại`),
       );
     });
   });
@@ -180,7 +190,7 @@ describe('LineController', () => {
       mockLineService.findLineById.mockResolvedValue(null);
 
       await expect(controller.findOne(id)).rejects.toThrow(
-        new NotFoundException(`Line với ID "${id}" không tồn tại`)
+        new NotFoundException(`Line với ID "${id}" không tồn tại`),
       );
     });
   });

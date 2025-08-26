@@ -1,19 +1,24 @@
-import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, QueryBuilder } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { 
-  ApprovalRequest, 
-  ApprovalStepInstance, 
-  ApprovalAction, 
+import {
+  ApprovalRequest,
+  ApprovalStepInstance,
+  ApprovalAction,
   ApprovalWorkflow,
-  ApprovalStep 
+  ApprovalStep,
 } from '../entities';
-import { 
-  CreateApprovalRequestDto, 
-  ApprovalActionDto, 
+import {
+  CreateApprovalRequestDto,
+  ApprovalActionDto,
   WithdrawApprovalRequestDto,
-  ApprovalRequestQueryDto 
+  ApprovalRequestQueryDto,
 } from '../dto';
 import { ApprovalStatus, ApprovalStepStatus, ApprovalType } from '../enums';
 import { ApprovalWorkflowService } from './approval-workflow.service';
@@ -33,13 +38,18 @@ export class ApprovalRequestService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async create(createDto: CreateApprovalRequestDto, requesterId: string): Promise<ApprovalRequest> {
+  async create(
+    createDto: CreateApprovalRequestDto,
+    requesterId: string,
+  ): Promise<ApprovalRequest> {
     // Lấy workflow
-    const workflow = await this.workflowService.findByCode(createDto.workflowCode);
-    
+    const workflow = await this.workflowService.findByCode(
+      createDto.workflowCode,
+    );
+
     // Lấy steps của workflow
     const steps = await this.stepService.findByWorkflowId(workflow.id);
-    
+
     if (steps.length === 0) {
       throw new BadRequestException('Workflow has no steps configured');
     }
@@ -83,7 +93,12 @@ export class ApprovalRequestService {
   async findById(id: string): Promise<ApprovalRequest> {
     const request = await this.requestRepository.findOne({
       where: { id },
-      relations: ['workflow', 'stepInstances', 'stepInstances.actions', 'comments'],
+      relations: [
+        'workflow',
+        'stepInstances',
+        'stepInstances.actions',
+        'comments',
+      ],
     });
 
     if (!request) {
@@ -93,45 +108,62 @@ export class ApprovalRequestService {
     return request;
   }
 
-  async findAll(query: ApprovalRequestQueryDto): Promise<{ data: ApprovalRequest[]; total: number }> {
-    const queryBuilder = this.requestRepository.createQueryBuilder('request')
+  async findAll(
+    query: ApprovalRequestQueryDto,
+  ): Promise<{ data: ApprovalRequest[]; total: number }> {
+    const queryBuilder = this.requestRepository
+      .createQueryBuilder('request')
       .leftJoinAndSelect('request.workflow', 'workflow')
       .leftJoinAndSelect('request.stepInstances', 'stepInstances')
       .where('request.isActive = :isActive', { isActive: true });
 
     // Apply filters
     if (query.status) {
-      queryBuilder.andWhere('request.status = :status', { status: query.status });
+      queryBuilder.andWhere('request.status = :status', {
+        status: query.status,
+      });
     }
 
     if (query.priority) {
-      queryBuilder.andWhere('request.priority = :priority', { priority: query.priority });
+      queryBuilder.andWhere('request.priority = :priority', {
+        priority: query.priority,
+      });
     }
 
     if (query.entityType) {
-      queryBuilder.andWhere('request.entityType = :entityType', { entityType: query.entityType });
+      queryBuilder.andWhere('request.entityType = :entityType', {
+        entityType: query.entityType,
+      });
     }
 
     if (query.requesterId) {
-      queryBuilder.andWhere('request.requesterId = :requesterId', { requesterId: query.requesterId });
+      queryBuilder.andWhere('request.requesterId = :requesterId', {
+        requesterId: query.requesterId,
+      });
     }
 
     if (query.workflowCode) {
-      queryBuilder.andWhere('workflow.code = :workflowCode', { workflowCode: query.workflowCode });
+      queryBuilder.andWhere('workflow.code = :workflowCode', {
+        workflowCode: query.workflowCode,
+      });
     }
 
     if (query.fromDate) {
-      queryBuilder.andWhere('request.createdAt >= :fromDate', { fromDate: query.fromDate });
+      queryBuilder.andWhere('request.createdAt >= :fromDate', {
+        fromDate: query.fromDate,
+      });
     }
 
     if (query.toDate) {
-      queryBuilder.andWhere('request.createdAt <= :toDate', { toDate: query.toDate });
+      queryBuilder.andWhere('request.createdAt <= :toDate', {
+        toDate: query.toDate,
+      });
     }
 
     if (query.search) {
       queryBuilder.andWhere(
         '(request.title ILIKE :search OR request.description ILIKE :search)',
-        { search: `%${query.search}%` }
+        { search: `%${query.search}%` },
       );
     }
 
@@ -151,20 +183,20 @@ export class ApprovalRequestService {
   }
 
   async takeAction(
-    requestId: string, 
-    actionDto: ApprovalActionDto, 
+    requestId: string,
+    actionDto: ApprovalActionDto,
     approverId: string,
-    approverName: string
+    approverName: string,
   ): Promise<ApprovalRequest> {
     const request = await this.findById(requestId);
-    
+
     if (request.status !== ApprovalStatus.PENDING) {
       throw new BadRequestException('Request is not in pending status');
     }
 
     // Lấy step instance hiện tại
     const currentStepInstance = request.stepInstances.find(
-      si => si.stepOrder === request.currentStepOrder
+      (si) => si.stepOrder === request.currentStepOrder,
     );
 
     if (!currentStepInstance) {
@@ -178,11 +210,13 @@ export class ApprovalRequestService {
 
     // Kiểm tra đã phê duyệt chưa
     const existingAction = currentStepInstance.actions?.find(
-      action => action.approverId === approverId
+      (action) => action.approverId === approverId,
     );
 
     if (existingAction) {
-      throw new BadRequestException('You have already taken action on this step');
+      throw new BadRequestException(
+        'You have already taken action on this step',
+      );
     }
 
     // Tạo action
@@ -191,9 +225,12 @@ export class ApprovalRequestService {
       stepInstanceId: currentStepInstance.id,
       approverId,
       approverName,
-      action: actionDto.action === 'approved' ? ApprovalStatus.APPROVED : 
-              actionDto.action === 'rejected' ? ApprovalStatus.REJECTED : 
-              ApprovalStatus.RETURNED,
+      action:
+        actionDto.action === 'approved'
+          ? ApprovalStatus.APPROVED
+          : actionDto.action === 'rejected'
+            ? ApprovalStatus.REJECTED
+            : ApprovalStatus.RETURNED,
       comments: actionDto.comments,
       actionDate: new Date(),
       attachments: actionDto.attachments,
@@ -216,9 +253,13 @@ export class ApprovalRequestService {
     return await this.findById(requestId);
   }
 
-  async withdraw(requestId: string, withdrawDto: WithdrawApprovalRequestDto, requesterId: string): Promise<ApprovalRequest> {
+  async withdraw(
+    requestId: string,
+    withdrawDto: WithdrawApprovalRequestDto,
+    requesterId: string,
+  ): Promise<ApprovalRequest> {
     const request = await this.findById(requestId);
-    
+
     if (request.requesterId !== requesterId) {
       throw new ForbiddenException('You can only withdraw your own requests');
     }
@@ -243,7 +284,10 @@ export class ApprovalRequestService {
     return request;
   }
 
-  private async createStepInstances(request: ApprovalRequest, steps: ApprovalStep[]): Promise<void> {
+  private async createStepInstances(
+    request: ApprovalRequest,
+    steps: ApprovalStep[],
+  ): Promise<void> {
     for (const step of steps) {
       const stepInstanceData = {
         requestId: request.id,
@@ -252,9 +296,14 @@ export class ApprovalRequestService {
         name: step.name,
         assignedApprovers: step.approvers,
         requiredApprovals: step.requiredApprovals,
-        status: step.stepOrder === 1 ? ApprovalStepStatus.PENDING : ApprovalStepStatus.WAITING,
+        status:
+          step.stepOrder === 1
+            ? ApprovalStepStatus.PENDING
+            : ApprovalStepStatus.WAITING,
         ...(step.stepOrder === 1 && { startedAt: new Date() }),
-        ...(step.timeoutHours && { dueDate: new Date(Date.now() + step.timeoutHours * 60 * 60 * 1000) }),
+        ...(step.timeoutHours && {
+          dueDate: new Date(Date.now() + step.timeoutHours * 60 * 60 * 1000),
+        }),
       };
 
       const stepInstance = this.stepInstanceRepository.create(stepInstanceData);
@@ -271,36 +320,40 @@ export class ApprovalRequestService {
   }
 
   private async processStepAction(
-    request: ApprovalRequest, 
-    stepInstance: ApprovalStepInstance, 
-    action: ApprovalAction
+    request: ApprovalRequest,
+    stepInstance: ApprovalStepInstance,
+    action: ApprovalAction,
   ): Promise<void> {
-    if (action.action === ApprovalStatus.REJECTED || action.action === ApprovalStatus.RETURNED) {
+    if (
+      action.action === ApprovalStatus.REJECTED ||
+      action.action === ApprovalStatus.RETURNED
+    ) {
       // Từ chối hoặc trả về
-      stepInstance.status = action.action === ApprovalStatus.REJECTED ? 
-        ApprovalStepStatus.REJECTED : ApprovalStepStatus.PENDING;
+      stepInstance.status =
+        action.action === ApprovalStatus.REJECTED
+          ? ApprovalStepStatus.REJECTED
+          : ApprovalStepStatus.PENDING;
       stepInstance.completedAt = new Date();
-      
+
       request.status = action.action;
       request.completedAt = new Date();
       request.rejectionReason = action.comments;
 
       await this.stepInstanceRepository.save(stepInstance);
       await this.requestRepository.save(request);
-      
     } else if (action.action === ApprovalStatus.APPROVED) {
       // Phê duyệt
       stepInstance.currentApprovals += 1;
-      
+
       if (stepInstance.currentApprovals >= stepInstance.requiredApprovals) {
         // Bước hoàn thành
         stepInstance.status = ApprovalStepStatus.APPROVED;
         stepInstance.completedAt = new Date();
-        
+
         // Chuyển sang bước tiếp theo hoặc hoàn thành
         await this.moveToNextStep(request);
       }
-      
+
       await this.stepInstanceRepository.save(stepInstance);
     }
   }
@@ -308,9 +361,9 @@ export class ApprovalRequestService {
   private async moveToNextStep(request: ApprovalRequest): Promise<void> {
     const nextStepOrder = request.currentStepOrder + 1;
     const nextStepInstance = await this.stepInstanceRepository.findOne({
-      where: { 
-        requestId: request.id, 
-        stepOrder: nextStepOrder 
+      where: {
+        requestId: request.id,
+        stepOrder: nextStepOrder,
       },
     });
 
@@ -318,7 +371,7 @@ export class ApprovalRequestService {
       // Có bước tiếp theo
       nextStepInstance.status = ApprovalStepStatus.PENDING;
       nextStepInstance.startedAt = new Date();
-      
+
       request.currentStepOrder = nextStepOrder;
       request.currentStepId = nextStepInstance.id;
 
@@ -330,12 +383,11 @@ export class ApprovalRequestService {
         requestId: request.id,
         stepOrder: nextStepOrder,
       });
-      
     } else {
       // Không có bước tiếp theo - hoàn thành
       request.status = ApprovalStatus.APPROVED;
       request.completedAt = new Date();
-      
+
       await this.requestRepository.save(request);
 
       // Emit event
@@ -346,38 +398,53 @@ export class ApprovalRequestService {
     }
   }
 
-  async getMyRequests(userId: string, query: ApprovalRequestQueryDto): Promise<{ data: ApprovalRequest[]; total: number }> {
+  async getMyRequests(
+    userId: string,
+    query: ApprovalRequestQueryDto,
+  ): Promise<{ data: ApprovalRequest[]; total: number }> {
     const modifiedQuery = { ...query, requesterId: userId };
     return await this.findAll(modifiedQuery);
   }
 
-  async getPendingRequests(userId: string, query: ApprovalRequestQueryDto): Promise<{ data: ApprovalRequest[]; total: number }> {
-    const queryBuilder = this.requestRepository.createQueryBuilder('request')
+  async getPendingRequests(
+    userId: string,
+    query: ApprovalRequestQueryDto,
+  ): Promise<{ data: ApprovalRequest[]; total: number }> {
+    const queryBuilder = this.requestRepository
+      .createQueryBuilder('request')
       .leftJoinAndSelect('request.workflow', 'workflow')
       .leftJoinAndSelect('request.stepInstances', 'stepInstances')
       .leftJoinAndSelect('stepInstances.actions', 'actions')
       .where('request.status = :status', { status: ApprovalStatus.PENDING })
-      .andWhere('stepInstances.status = :stepStatus', { stepStatus: ApprovalStepStatus.PENDING })
+      .andWhere('stepInstances.status = :stepStatus', {
+        stepStatus: ApprovalStepStatus.PENDING,
+      })
       .andWhere('stepInstances.assignedApprovers::jsonb ? :userId', { userId })
       .andWhere('request.isActive = :isActive', { isActive: true });
 
     // Apply other filters
     if (query.priority) {
-      queryBuilder.andWhere('request.priority = :priority', { priority: query.priority });
+      queryBuilder.andWhere('request.priority = :priority', {
+        priority: query.priority,
+      });
     }
 
     if (query.entityType) {
-      queryBuilder.andWhere('request.entityType = :entityType', { entityType: query.entityType });
+      queryBuilder.andWhere('request.entityType = :entityType', {
+        entityType: query.entityType,
+      });
     }
 
     if (query.workflowCode) {
-      queryBuilder.andWhere('workflow.code = :workflowCode', { workflowCode: query.workflowCode });
+      queryBuilder.andWhere('workflow.code = :workflowCode', {
+        workflowCode: query.workflowCode,
+      });
     }
 
     if (query.search) {
       queryBuilder.andWhere(
         '(request.title ILIKE :search OR request.description ILIKE :search)',
-        { search: `%${query.search}%` }
+        { search: `%${query.search}%` },
       );
     }
 

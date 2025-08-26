@@ -53,7 +53,10 @@ export class ApprovalWorkflowController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateDto: UpdateApprovalWorkflowDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateApprovalWorkflowDto,
+  ) {
     return await this.workflowService.update(id, updateDto);
   }
 
@@ -65,7 +68,10 @@ export class ApprovalWorkflowController {
 
   // Step management
   @Post(':id/steps')
-  async addStep(@Param('id') workflowId: string, @Body() createDto: CreateApprovalStepDto) {
+  async addStep(
+    @Param('id') workflowId: string,
+    @Body() createDto: CreateApprovalStepDto,
+  ) {
     return await this.stepService.create({ ...createDto, workflowId });
   }
 
@@ -84,7 +90,10 @@ export class ApprovalWorkflowController {
   }
 
   @Delete(':id/steps/:stepId')
-  async deleteStep(@Param('id') workflowId: string, @Param('stepId') stepId: string) {
+  async deleteStep(
+    @Param('id') workflowId: string,
+    @Param('stepId') stepId: string,
+  ) {
     await this.stepService.delete(stepId);
     return { message: 'Step deleted successfully' };
   }

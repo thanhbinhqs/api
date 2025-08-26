@@ -60,7 +60,7 @@ export class UserService {
         message: `User mới được tạo: ${user.username}`,
         createdBy: currentUser.username,
         type: 'USER_CREATED',
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
 
@@ -79,41 +79,244 @@ export class UserService {
     limit: number;
     totalPages: number;
   }> {
-    const skip = (page - 1) * limit;
+    // === VALIDATION VÀ CẤU HÌNH AN TOÀN ===
+    const safePage = this.validatePositiveNumber(page, 1);
+    const safeLimit = this.validatePositiveNumber(limit, 10, 100);
+    const skip = (safePage - 1) * safeLimit;
+
     const query = this.userRepository.createQueryBuilder('user');
 
+    // === XỬ LÝ FILTER THEO TỪNG TRƯỜNG CỤ THỂ CỦA USER ENTITY ===
     if (filter) {
       Object.entries(filter).forEach(([key, value]) => {
-        //console.log(Object.entries(filter))
-        if (
-          value != undefined &&
-          value != 'null' &&
-          value != 'undefined' &&
-          value != '' &&
-          value != null
-        ) {
-          const trimmedValue = value.toString().trim();
-          query.andWhere(`user.${key} ILIKE :${key}`, {
-            [key]: `%${trimmedValue}%`,
-          });
+        if (this.isValidFilterValue(value)) {
+          this.applyUserFieldFilter(query, key as keyof User, value);
         }
       });
     }
 
-    if (sort) {
-      query.orderBy(`user.${sort.field}`, sort.order);
-    }
+    // === SORTING AN TOÀN ===
+    this.applySafeUserSorting(query, sort);
 
-    const queryStr = query.getQuery();
-    const [users, total] = await query.skip(skip).take(limit).getManyAndCount();
+    const [users, total] = await query
+      .skip(skip)
+      .take(safeLimit)
+      .getManyAndCount();
 
     return {
       total,
-      page,
-      limit,
+      page: safePage,
+      limit: safeLimit,
       data: users.map((u) => new UserResponseDto(u)),
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.ceil(total / safeLimit),
     };
+  }
+
+  // === HELPER METHODS CHO USER ENTITY ===
+
+  private applyUserFieldFilter(
+    query: any,
+    field: keyof User,
+    value: any,
+  ): void {
+    const trimmedValue = value.toString().trim();
+
+    switch (field) {
+      // STRING FIELDS - exact match hoặc ILIKE
+      case 'username':
+      case 'employeeId':
+        if (trimmedValue) {
+          query.andWhere(`user.${field} ILIKE :${field}`, {
+            [field]: `%${trimmedValue}%`,
+          });
+        }
+        break;
+
+      // EMAIL FIELD - validation format
+      case 'email':
+        if (trimmedValue && this.isValidEmail(trimmedValue)) {
+          query.andWhere(`user.${field} ILIKE :${field}`, {
+            [field]: `%${trimmedValue}%`,
+          });
+        }
+        break;
+
+      // STRING FIELDS - full text search
+      case 'fullName':
+      case 'phone':
+      case 'address':
+        if (trimmedValue) {
+          query.andWhere(`user.${field} ILIKE :${field}`, {
+            [field]: `%${trimmedValue}%`,
+          });
+        }
+        break;
+
+      // BOOLEAN FIELDS
+      case 'isActive':
+      case 'isDeleted':
+        const boolValue = this.parseBoolean(value);
+        if (boolValue !== null) {
+          query.andWhere(`user.${field} = :${field}`, { [field]: boolValue });
+        }
+        break;
+
+      // NUMBER FIELDS
+      case 'failedLoginAttempts':
+        const numValue = this.parseNumber(value);
+        if (numValue !== null) {
+          query.andWhere(`user.${field} = :${field}`, { [field]: numValue });
+        }
+        break;
+
+      // DATE FIELDS
+      case 'birthday':
+      case 'lastLogin':
+      case 'changePasswordAt':
+      case 'lastFailedLogin':
+      case 'createdAt':
+      case 'updatedAt':
+        const dateValue = this.parseAndValidateDate(trimmedValue);
+        if (dateValue) {
+          // Filter by date range (same day)
+          const startOfDay = new Date(dateValue);
+          startOfDay.setHours(0, 0, 0, 0);
+          const endOfDay = new Date(dateValue);
+          endOfDay.setHours(23, 59, 59, 999);
+
+          query.andWhere(
+            `user.${field} BETWEEN :${field}Start AND :${field}End`,
+            {
+              [`${field}Start`]: startOfDay,
+              [`${field}End`]: endOfDay,
+            },
+          );
+        }
+        break;
+
+      // UUID FIELDS
+      case 'id':
+      case 'tokenVersion':
+        if (this.isValidUUID(trimmedValue)) {
+          query.andWhere(`user.${field} = :${field}`, {
+            [field]: trimmedValue,
+          });
+        }
+        break;
+
+      // ARRAY FIELDS (permissions)
+      case 'permissions':
+        if (Array.isArray(value) && value.length > 0) {
+          query.andWhere(`user.${field} @> :${field}`, { [field]: value });
+        }
+        break;
+
+      // Ignore sensitive fields
+      case 'password':
+      case 'externalSystemAuthInfo':
+        // Không cho phép filter theo các trường nhạy cảm
+        break;
+
+      default:
+        // Các trường khác - generic string search
+        if (trimmedValue) {
+          query.andWhere(`user.${field} ILIKE :${field}`, {
+            [field]: `%${trimmedValue}%`,
+          });
+        }
+        break;
+    }
+  }
+
+  private applySafeUserSorting(
+    query: any,
+    sort?: { field: string; order: 'ASC' | 'DESC' },
+  ): void {
+    const validSortFields: (keyof User)[] = [
+      'id',
+      'username',
+      'email',
+      'employeeId',
+      'fullName',
+      'phone',
+      'isActive',
+      'createdAt',
+      'updatedAt',
+      'lastLogin',
+      'failedLoginAttempts',
+    ];
+
+    if (
+      sort &&
+      sort.field &&
+      validSortFields.includes(sort.field as keyof User)
+    ) {
+      const safeOrder =
+        sort.order === 'ASC' || sort.order === 'DESC' ? sort.order : 'DESC';
+      query.orderBy(`user.${sort.field}`, safeOrder);
+    } else {
+      query.orderBy('user.createdAt', 'DESC');
+    }
+  }
+
+  // === VALIDATION HELPERS ===
+
+  private isValidFilterValue(value: any): boolean {
+    return (
+      value !== undefined &&
+      value !== 'null' &&
+      value !== 'undefined' &&
+      value !== '' &&
+      value !== null
+    );
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  private isValidUUID(uuid: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
+  }
+
+  private parseAndValidateDate(dateString: string): Date | null {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+      return date;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  private parseBoolean(value: any): boolean | null {
+    if (value === undefined || value === null) return null;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'string') {
+      const lowerValue = value.toLowerCase().trim();
+      if (['true', '1', 'yes', 'on'].includes(lowerValue)) return true;
+      if (['false', '0', 'no', 'off'].includes(lowerValue)) return false;
+    }
+    if (typeof value === 'number') return value !== 0;
+    return null;
+  }
+
+  private parseNumber(value: any): number | null {
+    const num = Number(value);
+    return isNaN(num) ? null : num;
+  }
+
+  private validatePositiveNumber(
+    value: any,
+    defaultValue: number,
+    maxValue?: number,
+  ): number {
+    const num = parseInt(value);
+    if (isNaN(num) || num < 1) return defaultValue;
+    return maxValue ? Math.min(num, maxValue) : num;
   }
 
   async findOne(

@@ -6,7 +6,7 @@ import { PartDetailStatus } from '../entities/part-detail.entity';
 export class PartDetailFilterDto extends BaseFilterDto {
   @ApiPropertyOptional({
     description: 'Tìm kiếm theo số serial',
-    example: 'SN-MOT-001'
+    example: 'SN-MOT-001',
   })
   @IsOptional()
   @IsString()
@@ -15,7 +15,7 @@ export class PartDetailFilterDto extends BaseFilterDto {
   @ApiPropertyOptional({
     description: 'Lọc theo trạng thái',
     example: PartDetailStatus.AVAILABLE,
-    enum: PartDetailStatus
+    enum: PartDetailStatus,
   })
   @IsOptional()
   @IsEnum(PartDetailStatus)
@@ -23,7 +23,7 @@ export class PartDetailFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID part',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()
@@ -31,7 +31,7 @@ export class PartDetailFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID vị trí',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()
@@ -39,7 +39,7 @@ export class PartDetailFilterDto extends BaseFilterDto {
 
   @ApiPropertyOptional({
     description: 'Lọc theo ID jig detail',
-    example: 'uuid-string'
+    example: 'uuid-string',
   })
   @IsOptional()
   @IsString()

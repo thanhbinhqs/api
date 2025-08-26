@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, NotFoundException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JigService } from './jig.service';
 import { CreateJigDto } from './dto/create-jig.dto';
 import { UpdateJigDto } from './dto/update-jig.dto';
@@ -20,7 +36,11 @@ export class JigController {
   @Post()
   @HasPermission(Permission.JIG_CREATE)
   @ApiOperation({ summary: 'Tạo jig mới' })
-  @ApiResponse({ status: 201, description: 'Jig đã được tạo thành công', type: Jig })
+  @ApiResponse({
+    status: 201,
+    description: 'Jig đã được tạo thành công',
+    type: Jig,
+  })
   async create(@Body() createJigDto: CreateJigDto): Promise<Jig> {
     return await this.jigService.create(createJigDto);
   }
@@ -28,8 +48,14 @@ export class JigController {
   @Get()
   @HasPermission(Permission.JIG_READ)
   @ApiOperation({ summary: 'Lấy danh sách jigs' })
-  @ApiResponse({ status: 200, description: 'Danh sách jigs', type: PaginatedResult })
-  async findAll(@Query() filterDto: JigFilterDto): Promise<PaginatedResult<Jig>> {
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách jigs',
+    type: PaginatedResult,
+  })
+  async findAll(
+    @Query() filterDto: JigFilterDto,
+  ): Promise<PaginatedResult<Jig>> {
     return await this.jigService.findAll(filterDto);
   }
 
@@ -60,7 +86,11 @@ export class JigController {
   @Get('maintenance/needed')
   @HasPermission(Permission.JIG_READ)
   @ApiOperation({ summary: 'Lấy danh sách jigs cần bảo trì' })
-  @ApiResponse({ status: 200, description: 'Danh sách jigs cần bảo trì', type: [Jig] })
+  @ApiResponse({
+    status: 200,
+    description: 'Danh sách jigs cần bảo trì',
+    type: [Jig],
+  })
   async getJigsNeedingMaintenance(): Promise<Jig[]> {
     return await this.jigService.getJigsNeedingMaintenance();
   }
@@ -77,7 +107,10 @@ export class JigController {
   @HasPermission(Permission.JIG_UPDATE)
   @ApiOperation({ summary: 'Cập nhật jig' })
   @ApiResponse({ status: 200, description: 'Jig đã được cập nhật', type: Jig })
-  async update(@Param('id') id: string, @Body() updateJigDto: UpdateJigDto): Promise<Jig> {
+  async update(
+    @Param('id') id: string,
+    @Body() updateJigDto: UpdateJigDto,
+  ): Promise<Jig> {
     return await this.jigService.update(id, updateJigDto);
   }
 

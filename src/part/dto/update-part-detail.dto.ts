@@ -5,7 +5,7 @@ import { IsString, IsNotEmpty } from 'class-validator';
 export class UpdatePartDetailDto extends PartialType(CreatePartDetailDto) {
   @ApiProperty({
     description: 'Version để kiểm tra optimistic locking',
-    example: 'uuid-version-string'
+    example: 'uuid-version-string',
   })
   @IsString()
   @IsNotEmpty()

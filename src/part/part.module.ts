@@ -9,10 +9,7 @@ import { PartDetail } from './entities/part-detail.entity';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Part, PartDetail]),
-    UserModule
-  ],
+  imports: [TypeOrmModule.forFeature([Part, PartDetail]), UserModule],
   controllers: [PartController, PartDetailController],
   providers: [PartService, PartDetailService],
   exports: [PartService, PartDetailService],

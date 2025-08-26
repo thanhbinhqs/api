@@ -43,7 +43,7 @@ export class FileManagerService {
         throw new BadRequestException('File ID is required for resume check');
       }
 
-      if(!size || +size <=0){
+      if (!size || +size <= 0) {
         throw new BadRequestException('File size is required for resume check');
       }
 
@@ -88,12 +88,12 @@ export class FileManagerService {
         fs.renameSync(tempFilePath, filePath);
         const totalSize = fs.statSync(filePath).size;
         let fileEntity = new UploadFile();
-        fileEntity.name =  fileId + '_' + fileName;
+        fileEntity.name = fileId + '_' + fileName;
         fileEntity.path = filePath;
         fileEntity.size = totalSize;
         fileEntity.mimeType = file.mimetype;
         fileEntity.owner = user;
-        fileEntity.isPublic =!user;
+        fileEntity.isPublic = !user;
         fileEntity.createdAt = new Date();
 
         fileEntity = await this.fileRepository.save(fileEntity);

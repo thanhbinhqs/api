@@ -46,7 +46,9 @@ export class LocationController {
     status: 409,
     description: 'Location với tên hoặc mã đã tồn tại',
   })
-  async create(@Body() createLocationDto: CreateLocationDto): Promise<Location> {
+  async create(
+    @Body() createLocationDto: CreateLocationDto,
+  ): Promise<Location> {
     return this.locationService.createLocation(createLocationDto);
   }
 
@@ -58,13 +60,17 @@ export class LocationController {
     description: 'Danh sách locations',
     type: PaginatedResult<Location>,
   })
-  async findAll(@Query() filterDto: LocationFilterDto): Promise<PaginatedResult<Location>> {
+  async findAll(
+    @Query() filterDto: LocationFilterDto,
+  ): Promise<PaginatedResult<Location>> {
     return this.locationService.findAllLocations(filterDto);
   }
 
   @Get('simple')
   @HasPermission(Permission.LOCATION_READ)
-  @ApiOperation({ summary: 'Lấy danh sách locations đơn giản không phân trang' })
+  @ApiOperation({
+    summary: 'Lấy danh sách locations đơn giản không phân trang',
+  })
   @ApiResponse({
     status: 200,
     description: 'Danh sách locations đơn giản',
@@ -160,7 +166,9 @@ export class LocationController {
     status: 404,
     description: 'Không tìm thấy location',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.locationService.deleteLocation(id);
     return { message: 'Location đã được xóa thành công' };
   }

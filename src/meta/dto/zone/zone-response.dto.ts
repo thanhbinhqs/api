@@ -20,7 +20,11 @@ export class ZoneResponseDto {
   @ApiProperty({ description: 'Zone cha', required: false })
   parentZone?: ZoneResponseDto;
 
-  @ApiProperty({ description: 'Danh sách zones con', type: [ZoneResponseDto], required: false })
+  @ApiProperty({
+    description: 'Danh sách zones con',
+    type: [ZoneResponseDto],
+    required: false,
+  })
   children?: ZoneResponseDto[];
 
   @ApiProperty({ description: 'Ngày tạo' })
@@ -35,8 +39,12 @@ export class ZoneResponseDto {
     this.slug = zone.slug;
     this.description = zone.description;
     this.code = zone.code;
-    this.parentZone = zone.parentZone ? new ZoneResponseDto(zone.parentZone) : undefined;
-    this.children = zone.children ? zone.children.map(child => new ZoneResponseDto(child)) : undefined;
+    this.parentZone = zone.parentZone
+      ? new ZoneResponseDto(zone.parentZone)
+      : undefined;
+    this.children = zone.children
+      ? zone.children.map((child) => new ZoneResponseDto(child))
+      : undefined;
     this.createdAt = zone.createdAt;
     this.updatedAt = zone.updatedAt;
   }

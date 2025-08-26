@@ -8,11 +8,15 @@ export class FileRepository extends Repository<UploadFile> {
     super(UploadFile, dataSource.createEntityManager());
   }
   async findUserFiles(user: User | null): Promise<UploadFile[]> {
-    const query = this.createQueryBuilder('file')
-      .leftJoinAndSelect('file.owner', 'owner');
+    const query = this.createQueryBuilder('file').leftJoinAndSelect(
+      'file.owner',
+      'owner',
+    );
 
     if (user) {
-      query.where('file.ownerId = :userId OR file.isPublic = true', { userId: user.id });
+      query.where('file.ownerId = :userId OR file.isPublic = true', {
+        userId: user.id,
+      });
     } else {
       query.where('file.isPublic = true');
     }
@@ -20,12 +24,15 @@ export class FileRepository extends Repository<UploadFile> {
     return query.getMany();
   }
 
-  async findById(id: string, user?: User| null): Promise<UploadFile | null> {
-    const query = this.createQueryBuilder('file')
-      .where('file.id = :id', { id });
+  async findById(id: string, user?: User | null): Promise<UploadFile | null> {
+    const query = this.createQueryBuilder('file').where('file.id = :id', {
+      id,
+    });
 
     if (user) {
-      query.andWhere('(file.ownerId = :userId OR file.isPublic = true)', { userId: user.id });
+      query.andWhere('(file.ownerId = :userId OR file.isPublic = true)', {
+        userId: user.id,
+      });
     } else {
       query.andWhere('file.isPublic = true');
     }

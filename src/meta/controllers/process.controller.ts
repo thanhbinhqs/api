@@ -54,7 +54,9 @@ export class ProcessController {
     description: 'Danh sách processes',
     type: PaginatedResult<Process>,
   })
-  async findAll(@Query() filterDto: ProcessFilterDto): Promise<PaginatedResult<Process>> {
+  async findAll(
+    @Query() filterDto: ProcessFilterDto,
+  ): Promise<PaginatedResult<Process>> {
     return this.processService.findAllProcesses(filterDto);
   }
 
@@ -105,7 +107,9 @@ export class ProcessController {
   @Delete(':id')
   @HasPermission(Permission.PROCESS_DELETE)
   @ApiOperation({ summary: 'Xóa process' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.processService.deleteProcess(id);
     return { message: 'Process đã được xóa thành công' };
   }

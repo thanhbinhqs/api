@@ -17,17 +17,13 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { NotificationEventService } from '../common/services/notification-event.service';
 
 @Module({
-  imports: [
-    ConfigModule,
-    TypeOrmModule.forFeature([Role, User]),
-    JwtModule,
-  ],
+  imports: [ConfigModule, TypeOrmModule.forFeature([Role, User]), JwtModule],
   controllers: [
-    UserController, 
-    PermissionController, 
-    RoleController, 
+    UserController,
+    PermissionController,
+    RoleController,
     SeedController,
-    ExternalSystemAuthController
+    ExternalSystemAuthController,
   ],
   providers: [
     UserService,

@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { UploadFile } from './file.entity';
 import { User } from '../../user/entities/user.entity';
 
@@ -18,7 +24,6 @@ export class FileShare {
   @JoinColumn()
   createdBy: User;
 
-
   @Column({ type: 'varchar', nullable: true })
   password?: string;
 
@@ -33,5 +38,4 @@ export class FileShare {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
-  
 }

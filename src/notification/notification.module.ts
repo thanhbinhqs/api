@@ -10,18 +10,22 @@ import { User } from 'src/user/entities/user.entity';
 import { NotificationEventService } from '../common/services/notification-event.service';
 
 @Module({
-  imports: [forwardRef(() => UserModule), JwtModule, TypeOrmModule.forFeature([User])],
+  imports: [
+    forwardRef(() => UserModule),
+    JwtModule,
+    TypeOrmModule.forFeature([User]),
+  ],
   providers: [
-    NotificationGateway, 
-    NotificationService, 
+    NotificationGateway,
+    NotificationService,
     NotificationIntegrationService,
     NotificationListener,
-    NotificationEventService
+    NotificationEventService,
   ],
   exports: [
-    NotificationService, 
+    NotificationService,
     NotificationIntegrationService,
-    NotificationEventService
+    NotificationEventService,
   ],
 })
 export class NotificationModule {}

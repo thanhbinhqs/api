@@ -10,10 +10,7 @@ import { UserModule } from '../user/user.module';
 import { DataSource } from 'typeorm';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([UploadFile, FileShare]),
-    UserModule
-  ],
+  imports: [TypeOrmModule.forFeature([UploadFile, FileShare]), UserModule],
   providers: [
     FileManagerService,
     {
@@ -23,11 +20,12 @@ import { DataSource } from 'typeorm';
     },
     {
       provide: FileShareRepository,
-      useFactory: (dataSource: DataSource) => new FileShareRepository(dataSource),
+      useFactory: (dataSource: DataSource) =>
+        new FileShareRepository(dataSource),
       inject: [DataSource],
-    }
+    },
   ],
   controllers: [FileManagerController],
-  exports: [FileManagerService]
+  exports: [FileManagerService],
 })
 export class FileManagerModule {}

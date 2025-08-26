@@ -54,7 +54,9 @@ export class ProjectController {
     description: 'Danh sách projects',
     type: PaginatedResult<Project>,
   })
-  async findAll(@Query() filterDto: ProjectFilterDto): Promise<PaginatedResult<Project>> {
+  async findAll(
+    @Query() filterDto: ProjectFilterDto,
+  ): Promise<PaginatedResult<Project>> {
     return this.projectService.findAllProjects(filterDto);
   }
 
@@ -105,7 +107,9 @@ export class ProjectController {
   @Delete(':id')
   @HasPermission(Permission.PROJECT_DELETE)
   @ApiOperation({ summary: 'Xóa project' })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.projectService.deleteProject(id);
     return { message: 'Project đã được xóa thành công' };
   }

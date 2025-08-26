@@ -43,7 +43,7 @@ export class SeedController {
       const users: any = [];
       for (let i = 0; i < 300; i++) {
         const user = faker.internet.username();
-        let as = await this.userRepository.findOne({
+        const as = await this.userRepository.findOne({
           where: {
             username: user.toString(),
           },

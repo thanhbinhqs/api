@@ -1,5 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ZoneService } from '../services/zone.service';
 import { LineService } from '../services/line.service';
@@ -39,9 +44,9 @@ export class MetadataController {
             properties: {
               value: { type: 'string' },
               label: { type: 'string' },
-              description: { type: 'string' }
-            }
-          }
+              description: { type: 'string' },
+            },
+          },
         },
         partDetailStatus: {
           type: 'array',
@@ -50,9 +55,9 @@ export class MetadataController {
             properties: {
               value: { type: 'string' },
               label: { type: 'string' },
-              description: { type: 'string' }
-            }
-          }
+              description: { type: 'string' },
+            },
+          },
         },
         jigTypes: {
           type: 'array',
@@ -60,9 +65,9 @@ export class MetadataController {
             type: 'object',
             properties: {
               value: { type: 'string' },
-              label: { type: 'string' }
-            }
-          }
+              label: { type: 'string' },
+            },
+          },
         },
         drawingTypes: {
           type: 'array',
@@ -70,9 +75,9 @@ export class MetadataController {
             type: 'object',
             properties: {
               value: { type: 'string' },
-              label: { type: 'string' }
-            }
-          }
+              label: { type: 'string' },
+            },
+          },
         },
         drawingStatus: {
           type: 'array',
@@ -80,9 +85,9 @@ export class MetadataController {
             type: 'object',
             properties: {
               value: { type: 'string' },
-              label: { type: 'string' }
-            }
-          }
+              label: { type: 'string' },
+            },
+          },
         },
         orderTypes: {
           type: 'array',
@@ -90,29 +95,73 @@ export class MetadataController {
             type: 'object',
             properties: {
               value: { type: 'string' },
-              label: { type: 'string' }
-            }
-          }
-        }
-      }
-    }
+              label: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
   })
   getEnums() {
     return {
       jigStatus: [
-        { value: JigStatus.NEW, label: 'Mới', description: 'Jig detail mới được tạo' },
-        { value: JigStatus.STORAGE, label: 'Kho', description: 'Đang lưu trữ trong kho' },
-        { value: JigStatus.LINE, label: 'Line sản xuất', description: 'Đang sử dụng trên line sản xuất' },
-        { value: JigStatus.REPAIR, label: 'Sửa chữa', description: 'Đang trong quá trình sửa chữa' },
-        { value: JigStatus.SCRAP, label: 'Hủy bỏ', description: 'Đã hủy bỏ không sử dụng được' },
-        { value: JigStatus.VENDOR, label: 'Nhà cung cấp', description: 'Đang ở nhà cung cấp' },
+        {
+          value: JigStatus.NEW,
+          label: 'Mới',
+          description: 'Jig detail mới được tạo',
+        },
+        {
+          value: JigStatus.STORAGE,
+          label: 'Kho',
+          description: 'Đang lưu trữ trong kho',
+        },
+        {
+          value: JigStatus.LINE,
+          label: 'Line sản xuất',
+          description: 'Đang sử dụng trên line sản xuất',
+        },
+        {
+          value: JigStatus.REPAIR,
+          label: 'Sửa chữa',
+          description: 'Đang trong quá trình sửa chữa',
+        },
+        {
+          value: JigStatus.SCRAP,
+          label: 'Hủy bỏ',
+          description: 'Đã hủy bỏ không sử dụng được',
+        },
+        {
+          value: JigStatus.VENDOR,
+          label: 'Nhà cung cấp',
+          description: 'Đang ở nhà cung cấp',
+        },
       ],
       partDetailStatus: [
-        { value: PartDetailStatus.AVAILABLE, label: 'Sẵn sàng', description: 'Part detail sẵn sàng sử dụng' },
-        { value: PartDetailStatus.IN_USE, label: 'Đang sử dụng', description: 'Part detail đang được sử dụng' },
-        { value: PartDetailStatus.MAINTENANCE, label: 'Bảo dưỡng', description: 'Đang trong quá trình bảo dưỡng' },
-        { value: PartDetailStatus.REPAIR, label: 'Sửa chữa', description: 'Đang trong quá trình sửa chữa' },
-        { value: PartDetailStatus.SCRAP, label: 'Hủy bỏ', description: 'Đã hủy bỏ không sử dụng được' },
+        {
+          value: PartDetailStatus.AVAILABLE,
+          label: 'Sẵn sàng',
+          description: 'Part detail sẵn sàng sử dụng',
+        },
+        {
+          value: PartDetailStatus.IN_USE,
+          label: 'Đang sử dụng',
+          description: 'Part detail đang được sử dụng',
+        },
+        {
+          value: PartDetailStatus.MAINTENANCE,
+          label: 'Bảo dưỡng',
+          description: 'Đang trong quá trình bảo dưỡng',
+        },
+        {
+          value: PartDetailStatus.REPAIR,
+          label: 'Sửa chữa',
+          description: 'Đang trong quá trình sửa chữa',
+        },
+        {
+          value: PartDetailStatus.SCRAP,
+          label: 'Hủy bỏ',
+          description: 'Đã hủy bỏ không sử dụng được',
+        },
       ],
       jigTypes: [
         { value: 'mechanical', label: 'Cơ khí' },
@@ -160,7 +209,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách zones' })
   async getZones() {
     const zones = await this.zoneService.findAllZonesSimple();
-    return zones.map(zone => ({
+    return zones.map((zone) => ({
       id: zone.id,
       name: zone.name,
       code: zone.code,
@@ -174,7 +223,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách lines' })
   async getLines() {
     const lines = await this.lineService.findAllLinesSimple();
-    return lines.map(line => ({
+    return lines.map((line) => ({
       id: line.id,
       name: line.name,
       code: line.code,
@@ -190,7 +239,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách projects' })
   async getProjects() {
     const projects = await this.projectService.findAllProjectsSimple();
-    return projects.map(project => ({
+    return projects.map((project) => ({
       id: project.id,
       name: project.name,
       code: project.code,
@@ -206,7 +255,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách processes' })
   async getProcesses() {
     const processes = await this.processService.findAllProcessesSimple();
-    return processes.map(process => ({
+    return processes.map((process) => ({
       id: process.id,
       name: process.name,
       code: process.code,
@@ -220,7 +269,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách locations' })
   async getLocations() {
     const locations = await this.locationService.findAllLocationsSimple();
-    return locations.map(location => ({
+    return locations.map((location) => ({
       id: location.id,
       name: location.name,
       code: location.code,
@@ -234,7 +283,7 @@ export class MetadataController {
   @ApiResponse({ status: 200, description: 'Danh sách vendors' })
   async getVendors() {
     const vendors = await this.vendorService.findAllVendorsSimple();
-    return vendors.map(vendor => ({
+    return vendors.map((vendor) => ({
       id: vendor.id,
       name: vendor.name,
       code: vendor.code,
@@ -245,8 +294,8 @@ export class MetadataController {
 
   @Get('all')
   @ApiOperation({ summary: 'Lấy tất cả metadata trong một request' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Tất cả metadata',
     schema: {
       type: 'object',
@@ -258,19 +307,20 @@ export class MetadataController {
         processes: { type: 'array' },
         locations: { type: 'array' },
         vendors: { type: 'array' },
-      }
-    }
+      },
+    },
   })
   async getAllMetadata() {
-    const [enums, zones, lines, projects, processes, locations, vendors] = await Promise.all([
-      this.getEnums(),
-      this.getZones(),
-      this.getLines(),
-      this.getProjects(),
-      this.getProcesses(),
-      this.getLocations(),
-      this.getVendors(),
-    ]);
+    const [enums, zones, lines, projects, processes, locations, vendors] =
+      await Promise.all([
+        this.getEnums(),
+        this.getZones(),
+        this.getLines(),
+        this.getProjects(),
+        this.getProcesses(),
+        this.getLocations(),
+        this.getVendors(),
+      ]);
 
     return {
       enums,
@@ -286,8 +336,8 @@ export class MetadataController {
 
   @Get('dropdown-options')
   @ApiOperation({ summary: 'Lấy options cho dropdown/select components' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Dropdown options được format cho UI',
     schema: {
       type: 'object',
@@ -299,74 +349,75 @@ export class MetadataController {
             properties: {
               value: { type: 'string' },
               label: { type: 'string' },
-              disabled: { type: 'boolean' }
-            }
-          }
-        }
-      }
-    }
+              disabled: { type: 'boolean' },
+            },
+          },
+        },
+      },
+    },
   })
   async getDropdownOptions() {
-    const [zones, lines, projects, processes, locations, vendors] = await Promise.all([
-      this.getZones(),
-      this.getLines(),
-      this.getProjects(),
-      this.getProcesses(),
-      this.getLocations(),
-      this.getVendors(),
-    ]);
+    const [zones, lines, projects, processes, locations, vendors] =
+      await Promise.all([
+        this.getZones(),
+        this.getLines(),
+        this.getProjects(),
+        this.getProcesses(),
+        this.getLocations(),
+        this.getVendors(),
+      ]);
 
     return {
-      zones: zones.map(zone => ({
+      zones: zones.map((zone) => ({
         value: zone.id,
         label: `${zone.code} - ${zone.name}`,
         disabled: !zone.isActive,
       })),
-      lines: lines.map(line => ({
+      lines: lines.map((line) => ({
         value: line.id,
         label: `${line.code} - ${line.name}`,
         disabled: !line.isActive,
         zoneId: line.zoneId,
       })),
-      projects: projects.map(project => ({
+      projects: projects.map((project) => ({
         value: project.id,
         label: `${project.code} - ${project.name}`,
         disabled: !project.isActive,
       })),
-      processes: processes.map(process => ({
+      processes: processes.map((process) => ({
         value: process.id,
         label: `${process.code} - ${process.name}`,
         disabled: !process.isActive,
       })),
-      locations: locations.map(location => ({
+      locations: locations.map((location) => ({
         value: location.id,
         label: `${location.code} - ${location.name}`,
         disabled: !location.isActive,
       })),
-      vendors: vendors.map(vendor => ({
+      vendors: vendors.map((vendor) => ({
         value: vendor.id,
         label: `${vendor.code} - ${vendor.name}`,
         disabled: !vendor.isActive,
       })),
-      jigStatus: this.getEnums().jigStatus.map(status => ({
+      jigStatus: this.getEnums().jigStatus.map((status) => ({
         value: status.value,
         label: status.label,
         description: status.description,
       })),
-      partDetailStatus: this.getEnums().partDetailStatus.map(status => ({
+      partDetailStatus: this.getEnums().partDetailStatus.map((status) => ({
         value: status.value,
         label: status.label,
         description: status.description,
       })),
-      jigTypes: this.getEnums().jigTypes.map(type => ({
+      jigTypes: this.getEnums().jigTypes.map((type) => ({
         value: type.value,
         label: type.label,
       })),
-      drawingTypes: this.getEnums().drawingTypes.map(type => ({
+      drawingTypes: this.getEnums().drawingTypes.map((type) => ({
         value: type.value,
         label: type.label,
       })),
-      drawingStatus: this.getEnums().drawingStatus.map(status => ({
+      drawingStatus: this.getEnums().drawingStatus.map((status) => ({
         value: status.value,
         label: status.label,
       })),

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindManyOptions, Like, ILike } from 'typeorm';
 import { CreateJigDto } from './dto/create-jig.dto';
@@ -19,7 +23,8 @@ export class JigService {
       const jig = this.jigRepository.create(createJigDto);
       return await this.jigRepository.save(jig);
     } catch (error) {
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
+        // Unique violation
         throw new BadRequestException('Jig với code hoặc name này đã tồn tại');
       }
       throw error;
@@ -45,7 +50,8 @@ export class JigService {
       hasPart,
     } = filterDto;
 
-    const queryBuilder = this.jigRepository.createQueryBuilder('jig')
+    const queryBuilder = this.jigRepository
+      .createQueryBuilder('jig')
       .leftJoinAndSelect('jig.vendor', 'vendor')
       .leftJoinAndSelect('jig.project', 'project')
       .leftJoinAndSelect('jig.process', 'process')
@@ -56,7 +62,7 @@ export class JigService {
     if (search) {
       queryBuilder.andWhere(
         '(jig.name ILIKE :search OR jig.code ILIKE :search OR jig.mesCode ILIKE :search OR jig.description ILIKE :search)',
-        { search: `%${search}%` }
+        { search: `%${search}%` },
       );
     }
 
@@ -70,7 +76,9 @@ export class JigService {
     }
 
     if (mesCode) {
-      queryBuilder.andWhere('jig.mesCode ILIKE :mesCode', { mesCode: `%${mesCode}%` });
+      queryBuilder.andWhere('jig.mesCode ILIKE :mesCode', {
+        mesCode: `%${mesCode}%`,
+      });
     }
 
     if (vendorId) {
@@ -94,7 +102,9 @@ export class JigService {
     }
 
     if (needMaintenance !== undefined) {
-      queryBuilder.andWhere('jig.needMaintenance = :needMaintenance', { needMaintenance });
+      queryBuilder.andWhere('jig.needMaintenance = :needMaintenance', {
+        needMaintenance,
+      });
     }
 
     if (hasPart !== undefined) {
@@ -126,7 +136,7 @@ export class JigService {
         'details.line',
         'details.vendor',
         'details.partDetails',
-        'parts'
+        'parts',
       ],
     });
 
@@ -139,12 +149,13 @@ export class JigService {
 
   async update(id: string, updateJigDto: UpdateJigDto): Promise<Jig> {
     const jig = await this.findOne(id);
-    
+
     try {
       Object.assign(jig, updateJigDto);
       return await this.jigRepository.save(jig);
     } catch (error) {
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
+        // Unique violation
         throw new BadRequestException('Jig với code hoặc name này đã tồn tại');
       }
       throw error;

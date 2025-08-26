@@ -47,7 +47,10 @@ export class ApprovalRequestController {
   }
 
   @Get('pending')
-  async getPendingRequests(@Query() query: ApprovalRequestQueryDto, @Request() req) {
+  async getPendingRequests(
+    @Query() query: ApprovalRequestQueryDto,
+    @Request() req,
+  ) {
     return await this.requestService.getPendingRequests(req.user.id, query);
   }
 

@@ -9,7 +9,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  
+
   // Serve static files
   const path = join(__dirname, '..', 'public');
   app.useStaticAssets(path, {

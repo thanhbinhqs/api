@@ -1,4 +1,13 @@
-import { IsString, IsOptional, IsEnum, IsObject, IsInt, Min, IsArray, IsBoolean } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsEnum,
+  IsObject,
+  IsInt,
+  Min,
+  IsArray,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApprovalType } from '../enums';
 

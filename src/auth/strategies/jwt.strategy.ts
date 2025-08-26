@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from '../../user/entities/user.entity';
-import { UserService } from '../../user/user.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -19,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any): Promise<User | null> {
+  async validate(payload: { sub: string; tokenVersion: string }): Promise<User | null> {
     const user = await this.userRepository.findOne({
       where: {
         id: payload.sub,
@@ -27,7 +26,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       relations: ['roles', 'roles.permissions'],
     });
 
-    if (!user || user.tokenVersion !== payload.tokenVersion) {
+    if (!user || Number(user.tokenVersion) !== Number(payload.tokenVersion)) {
       return null;
     }
 

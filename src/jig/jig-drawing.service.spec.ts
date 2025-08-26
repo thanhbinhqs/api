@@ -43,7 +43,9 @@ describe('JigDrawingService', () => {
     }).compile();
 
     service = module.get<JigDrawingService>(JigDrawingService);
-    repository = module.get<Repository<JigDrawing>>(getRepositoryToken(JigDrawing));
+    repository = module.get<Repository<JigDrawing>>(
+      getRepositoryToken(JigDrawing),
+    );
   });
 
   it('should be defined', () => {

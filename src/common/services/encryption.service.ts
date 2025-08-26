@@ -26,9 +26,8 @@ export class EncryptionService {
         SystemSettingKey.SYSTEM_AUDIT_LOG_ENABLED
       ] || false;
     if (auditLogEnabled) {
-      console.log(
-        `Initializing encryption service with algorithm: ${this.algorithm}`,
-      );
+      // TODO: Replace with proper logging service
+      // console.log(`Initializing encryption service with algorithm: ${this.algorithm}`);
     }
     const encryptionKey = this.configService.get<string>('ENCRYPTION_KEY');
     const encryptionIv = this.configService.get<string>('ENCRYPTION_IV');

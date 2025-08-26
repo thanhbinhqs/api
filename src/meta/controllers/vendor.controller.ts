@@ -58,7 +58,9 @@ export class VendorController {
     description: 'Danh sách vendors',
     type: PaginatedResult<Vendor>,
   })
-  async findAll(@Query() filterDto: VendorFilterDto): Promise<PaginatedResult<Vendor>> {
+  async findAll(
+    @Query() filterDto: VendorFilterDto,
+  ): Promise<PaginatedResult<Vendor>> {
     return this.vendorService.findAllVendors(filterDto);
   }
 
@@ -160,7 +162,9 @@ export class VendorController {
     status: 404,
     description: 'Không tìm thấy vendor',
   })
-  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<{ message: string }> {
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string }> {
     await this.vendorService.deleteVendor(id);
     return { message: 'Vendor đã được xóa thành công' };
   }

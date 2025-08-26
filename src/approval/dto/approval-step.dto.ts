@@ -1,4 +1,12 @@
-import { IsString, IsOptional, IsInt, Min, IsArray, IsBoolean, IsObject } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  Min,
+  IsArray,
+  IsBoolean,
+  IsObject,
+} from 'class-validator';
 
 export class CreateApprovalStepDto {
   @IsString()

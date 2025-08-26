@@ -19,13 +19,14 @@ import {
 @Controller('approval/delegations')
 // @UseGuards(JwtAuthGuard) // Sẽ uncomment sau khi có auth guard
 export class ApprovalDelegationController {
-  constructor(
-    private readonly delegationService: ApprovalDelegationService,
-  ) {}
+  constructor(private readonly delegationService: ApprovalDelegationService) {}
 
   @Post()
   async create(@Body() createDto: CreateApprovalDelegationDto, @Request() req) {
-    return await this.delegationService.create(createDto, req.user?.id || 'user-id');
+    return await this.delegationService.create(
+      createDto,
+      req.user?.id || 'user-id',
+    );
   }
 
   @Get()
@@ -34,7 +35,10 @@ export class ApprovalDelegationController {
   }
 
   @Get('active')
-  async getActiveDelegations(@Query('workflowCode') workflowCode: string, @Request() req) {
+  async getActiveDelegations(
+    @Query('workflowCode') workflowCode: string,
+    @Request() req,
+  ) {
     return await this.delegationService.findActiveDelegations(
       req.user?.id || 'user-id',
       workflowCode,
@@ -52,7 +56,11 @@ export class ApprovalDelegationController {
     @Body() updateDto: UpdateApprovalDelegationDto,
     @Request() req,
   ) {
-    return await this.delegationService.update(id, updateDto, req.user?.id || 'user-id');
+    return await this.delegationService.update(
+      id,
+      updateDto,
+      req.user?.id || 'user-id',
+    );
   }
 
   @Delete(':id')
@@ -63,6 +71,9 @@ export class ApprovalDelegationController {
 
   @Post(':id/deactivate')
   async deactivate(@Param('id') id: string, @Request() req) {
-    return await this.delegationService.deactivate(id, req.user?.id || 'user-id');
+    return await this.delegationService.deactivate(
+      id,
+      req.user?.id || 'user-id',
+    );
   }
 }
