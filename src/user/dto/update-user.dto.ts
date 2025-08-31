@@ -24,6 +24,16 @@ export class UpdateUserDto {
   email?: string;
 
   @ApiProperty({
+    description: 'Employee ID',
+    example: '12345678',
+    required: false,
+  })
+  @Expose()
+  @IsString({ message: 'EmployeeId không hợp lệ' })
+  @IsOptional()
+  employeeId?: string;
+
+  @ApiProperty({
     description: 'Full name of user',
     example: 'Nguyen Van A',
     required: false,
@@ -78,4 +88,14 @@ export class UpdateUserDto {
   @IsString({ message: 'Địa chỉ phải là chuỗi ký tự' })
   @IsOptional()
   address?: string;
+
+  //externalInfo can be any JSON object
+  @ApiProperty({
+    description: 'External information as JSON object',
+    example: { facebook: 'fb.com/user', twitter: '@user' },
+    required: false,
+  })
+  @Expose()
+  @IsOptional()
+  externalInfo?: any;
 }

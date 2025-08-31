@@ -32,7 +32,7 @@ export class UserService {
     @Inject(forwardRef(() => EncryptionService))
     private encryptionService: EncryptionService,
     private readonly notificationEventService: NotificationEventService,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserResponseDto> {
     let user = await this.userRepository.findOne({
@@ -348,6 +348,11 @@ export class UserService {
 
     user = await this.userRepository.save({ ...user, ...updateUserDto });
     return new UserResponseDto(user);
+  }
+
+  async updateProfile(updateUserDto: UpdateUserDto): Promise<UserResponseDto> {
+    const id = this.request.user?.id;
+    return this.update(id!, updateUserDto);
   }
 
   async remove(id: string): Promise<UserResponseDto> {

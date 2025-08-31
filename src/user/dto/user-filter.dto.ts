@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsOptional, IsString, IsDateString, IsBoolean } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
+import { T } from 'node_modules/@faker-js/faker/dist/airline-CLphikKp.cjs';
 
 export class UserFilterDto {
   @ApiPropertyOptional()
@@ -22,6 +23,23 @@ export class UserFilterDto {
   @IsOptional()
   @IsString({ message: 'Họ tên phải là chuỗi ký tự' })
   fullName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsBoolean({ message: 'IsActive phải là boolean' })
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) {
+      return undefined;
+    }
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'string') {
+      return value.toLowerCase() === 'true';
+    }
+    return undefined;
+  })
+  isActive?: boolean;
 
   @ApiPropertyOptional()
   @IsOptional()

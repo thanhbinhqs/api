@@ -43,7 +43,7 @@ import { UpdateExternalInfoDto } from './dto/update-external-info.dto';
 @Controller('user')
 @UseGuards(JwtAuthGuard, PermissionGuard)
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @ApiOperation({ summary: 'Create new user' })
   @ApiResponse({ status: 201, description: 'User created successfully' })
@@ -53,6 +53,25 @@ export class UserController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
+
+
+  @ApiOperation({ summary: 'Get current user info' })
+  @Get('me')
+  getCurrentUser(@Req() req: Request) {
+    const userId = (req.user as any)?.id;
+    return this.userService.findOne(userId);
+  }
+
+  @ApiOperation({ summary: 'Update Profile' })
+  @ApiResponse({ status: 200, description: 'User updated' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Patch('profile')
+  updateProfile(
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.updateProfile(updateUserDto);
+  }
+
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List of users' })
@@ -93,6 +112,7 @@ export class UserController {
   ) {
     return this.userService.update(id, updateUserDto);
   }
+
 
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({ status: 200, description: 'User deleted' })
@@ -172,13 +192,7 @@ export class UserController {
     });
   }
 
-  @ApiOperation({ summary: 'Get current user info' })
-  @Get('me')
-  @HasPermission(Permission.USER_READ)
-  getCurrentUser(@Req() req: Request) {
-    const userId = (req.user as any)?.id;
-    return this.userService.findOne(userId);
-  }
+
 
   @ApiOperation({ summary: 'Update user external info' })
   @Patch(':id/external-info')
