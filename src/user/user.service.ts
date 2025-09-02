@@ -80,6 +80,8 @@ export class UserService {
     totalPages: number;
   }> {
     // === VALIDATION VÀ CẤU HÌNH AN TOÀN ===
+
+    //await new Promise((resolve) => setTimeout(resolve, 5000)); // Thêm độ trễ 5000ms để chống timing attack
     const safePage = this.validatePositiveNumber(page, 1);
     const safeLimit = this.validatePositiveNumber(limit, 10, 100);
     const skip = (safePage - 1) * safeLimit;
